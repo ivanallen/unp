@@ -62,6 +62,7 @@ int main(int argc, char* argv[]) {
     n = read(clientfd, buf, 64);
     if (n == 0) {
       puts("peer closed");
+      sleep(1);
       break;
     }
     upper(buf);
