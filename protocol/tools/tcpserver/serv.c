@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  if (argc < 4) {
+  if (argc >= 4) {
     if (!strcmp("SO_LINGER", argv[3])) {
       so_linger = 1;
     }
