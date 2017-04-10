@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <arpa/inet.h>
 
 
@@ -13,8 +14,36 @@ void upper(char* buf) {
   }
 }
 
+/*
+ * ./serv <ip> <port> [SO_LINGER]
+ *
+ */
+
+int so_linger = 0;
+
+void setopt(int sockfd) {
+  int ret;
+  if (so_linger) {
+    struct linger slinger;
+    slinger.l_onoff = 1; // 关闭连接时发送 RST 段
+    slinger.l_linger = 0;// 不等待
+    ret = setsockopt(sockfd, SOL_SOCKET, SO_LINGER, &slinger, sizeof(slinger));
+    if (ret < 0) ERR_EXIT("set SO_LINGER failed");
+  }
+}
+
 int main(int argc, char* argv[]) {
-  if (argc < 3) return 1;
+  if (argc < 3) {
+    printf("Usage: %s <ip> <port> [SO_LINGER]\n", argv[0]);
+    return 1;
+  }
+
+  if (argc < 4) {
+    if (!strcmp("SO_LINGER", argv[3])) {
+      so_linger = 1;
+    }
+  }
+
   struct sockaddr_in servaddr, cliaddr;
   int sockfd, clientfd, ret, n;
   socklen_t cliaddrlen;
@@ -30,6 +59,8 @@ int main(int argc, char* argv[]) {
   puts("2. create socket");
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) ERR_EXIT("socket");
+  // set option
+  setopt(sockfd);
 
   // 3. bind sockaddr
   puts("3. bind sockaddr");
@@ -64,6 +95,12 @@ int main(int argc, char* argv[]) {
       puts("peer closed");
       sleep(1);
       break;
+    }
+    else if (n < 0) {
+      if (errno == EINTR) continue;
+      else {
+        ERR_EXIT("read error");
+      }
     }
     upper(buf);
     write(clientfd, buf, n);
