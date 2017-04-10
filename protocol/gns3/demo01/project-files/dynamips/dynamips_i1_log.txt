@@ -1,0 +1,48 @@
+Apr 09 12:35:48.047 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
+Apr 09 12:35:48.049 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 4003.
+Apr 09 12:35:48.158 HYPERVISOR: exec_cmd: hypervisor version 
+Apr 09 12:35:48.159 HYPERVISOR: exec_cmd: hypervisor uuid 
+Apr 09 12:35:48.160 HYPERVISOR: exec_cmd: hypervisor working_dir D:\Users\Ella\GNS3\projects\untitled\project-files\dynamips 
+Apr 09 12:35:48.172 GENERAL: working_dir=D:\Users\Ella\GNS3\projects\untitled\project-files\dynamips
+Apr 09 12:35:48.174 HYPERVISOR: exec_cmd: vm create R1 1 c3600 
+Apr 09 12:35:48.176 VM: VM R1 created.
+Apr 09 12:35:48.177 HYPERVISOR: exec_cmd: vm set_con_tcp_port R1 2001 
+Apr 09 12:35:48.177 HYPERVISOR: exec_cmd: c3600 get_mac_addr R1 
+Apr 09 12:35:48.178 HYPERVISOR: exec_cmd: vm get_status R1 
+Apr 09 12:35:48.178 HYPERVISOR: exec_cmd: vm slot_add_binding R1 0 0 NM-4E 
+Apr 09 12:35:48.188 HYPERVISOR: exec_cmd: vm set_ios R1 G:\doc\CCNA\images\IOS\C3640-JK.BIN 
+Apr 09 12:35:48.189 HYPERVISOR: exec_cmd: vm set_ram R1 192 
+Apr 09 12:35:48.190 HYPERVISOR: exec_cmd: vm set_nvram R1 256 
+Apr 09 12:35:48.190 HYPERVISOR: exec_cmd: vm get_status R1 
+Apr 09 12:35:48.191 HYPERVISOR: exec_cmd: vm set_idle_pc R1 0x6046d710 
+Apr 09 12:35:48.191 HYPERVISOR: exec_cmd: vm set_exec_area R1 64 
+Apr 09 12:35:48.191 HYPERVISOR: exec_cmd: vm get_status R1 
+Apr 09 12:35:48.192 HYPERVISOR: exec_cmd: vm slot_add_binding R1 1 0 NM-4T 
+Apr 09 12:35:48.195 HYPERVISOR: exec_cmd: vm set_config R1 configs/i1_startup-config.cfg 
+Apr 09 12:35:48.198 HYPERVISOR: exec_cmd: vm create Ghost 0 c3600 
+Apr 09 12:35:48.200 VM: VM Ghost created.
+Apr 09 12:35:48.201 HYPERVISOR: exec_cmd: vm set_ios Ghost G:\doc\CCNA\images\IOS\C3640-JK.BIN 
+Apr 09 12:35:48.202 HYPERVISOR: exec_cmd: vm set_ghost_status Ghost 1 
+Apr 09 12:35:48.202 HYPERVISOR: exec_cmd: vm set_ghost_file Ghost C3640-JK.BIN-192.ghost 
+Apr 09 12:35:48.203 HYPERVISOR: exec_cmd: vm set_ram Ghost 192 
+Apr 09 12:35:48.204 HYPERVISOR: exec_cmd: vm get_status Ghost 
+Apr 09 12:35:48.219 HYPERVISOR: exec_cmd: vm start Ghost 
+Apr 09 12:35:49.299 HYPERVISOR: exec_cmd: vm get_status Ghost 
+Apr 09 12:35:49.299 HYPERVISOR: exec_cmd: vm stop Ghost 
+Apr 09 12:35:49.466 VM: VM Ghost shutdown.
+Apr 09 12:35:49.467 HYPERVISOR: exec_cmd: vm clean_delete Ghost 
+Apr 09 12:35:49.467 VM: VM Ghost destroyed.
+Apr 09 12:35:49.474 HYPERVISOR: exec_cmd: vm set_ghost_status R1 2 
+Apr 09 12:35:49.474 HYPERVISOR: exec_cmd: vm set_ghost_file R1 C3640-JK.BIN-192.ghost 
+Apr 09 12:37:42.599 HYPERVISOR: exec_cmd: nio create_udp udp-c39b0682-685a-4e71-a98a-962f7fd07f38 10001 127.0.0.1 10000 
+Apr 09 12:37:42.618 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 0 0 udp-c39b0682-685a-4e71-a98a-962f7fd07f38 
+Apr 09 12:37:42.619 HYPERVISOR: exec_cmd: vm get_status R1 
+Apr 09 12:37:48.952 HYPERVISOR: exec_cmd: nio create_udp udp-ca3d59d9-87a7-464c-8026-f36347161a25 10002 127.0.0.1 10003 
+Apr 09 12:37:48.953 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 0 1 udp-ca3d59d9-87a7-464c-8026-f36347161a25 
+Apr 09 12:37:48.954 HYPERVISOR: exec_cmd: vm get_status R1 
+Apr 09 12:38:39.060 HYPERVISOR: exec_cmd: vm get_status R1 
+Apr 09 12:38:39.076 HYPERVISOR: exec_cmd: vm start R1 
+Apr 09 13:46:50.092 HYPERVISOR: exec_cmd: vm extract_config R1 
+Apr 09 13:47:03.828 HYPERVISOR: exec_cmd: vm get_status R1 
+Apr 09 13:47:03.829 HYPERVISOR: exec_cmd: vm stop R1 
+Apr 09 13:47:04.000 VM: VM R1 shutdown.

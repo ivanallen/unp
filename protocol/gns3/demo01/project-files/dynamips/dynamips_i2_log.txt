@@ -1,0 +1,43 @@
+Apr 09 12:35:53.784 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
+Apr 09 12:35:53.785 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 4005.
+Apr 09 12:35:54.234 HYPERVISOR: exec_cmd: hypervisor version 
+Apr 09 12:35:54.235 HYPERVISOR: exec_cmd: hypervisor uuid 
+Apr 09 12:35:54.236 HYPERVISOR: exec_cmd: hypervisor working_dir D:\Users\Ella\GNS3\projects\untitled\project-files\dynamips 
+Apr 09 12:35:54.237 GENERAL: working_dir=D:\Users\Ella\GNS3\projects\untitled\project-files\dynamips
+Apr 09 12:35:54.237 HYPERVISOR: exec_cmd: vm create R2 2 c3600 
+Apr 09 12:35:54.241 VM: VM R2 created.
+Apr 09 12:35:54.242 HYPERVISOR: exec_cmd: vm set_con_tcp_port R2 2002 
+Apr 09 12:35:54.243 HYPERVISOR: exec_cmd: c3600 get_mac_addr R2 
+Apr 09 12:35:54.243 HYPERVISOR: exec_cmd: vm get_status R2 
+Apr 09 12:35:54.244 HYPERVISOR: exec_cmd: vm slot_add_binding R2 0 0 NM-4E 
+Apr 09 12:35:54.245 HYPERVISOR: exec_cmd: vm set_ios R2 G:\doc\CCNA\images\IOS\C3640-JK.BIN 
+Apr 09 12:35:54.246 HYPERVISOR: exec_cmd: vm set_ram R2 192 
+Apr 09 12:35:54.247 HYPERVISOR: exec_cmd: vm set_nvram R2 256 
+Apr 09 12:35:54.248 HYPERVISOR: exec_cmd: vm get_status R2 
+Apr 09 12:35:54.248 HYPERVISOR: exec_cmd: vm set_idle_pc R2 0x6046d710 
+Apr 09 12:35:54.249 HYPERVISOR: exec_cmd: vm set_exec_area R2 64 
+Apr 09 12:35:54.250 HYPERVISOR: exec_cmd: vm get_status R2 
+Apr 09 12:35:54.250 HYPERVISOR: exec_cmd: vm slot_add_binding R2 1 0 NM-4T 
+Apr 09 12:35:54.256 HYPERVISOR: exec_cmd: vm set_config R2 configs/i2_startup-config.cfg 
+Apr 09 12:35:54.257 HYPERVISOR: exec_cmd: vm set_ghost_status R2 2 
+Apr 09 12:35:54.258 HYPERVISOR: exec_cmd: vm set_ghost_file R2 C3640-JK.BIN-192.ghost 
+Apr 09 12:37:48.936 HYPERVISOR: exec_cmd: nio create_udp udp-67e0a42e-7b99-4568-a74f-3d53fe819694 10003 127.0.0.1 10002 
+Apr 09 12:37:48.952 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 0 udp-67e0a42e-7b99-4568-a74f-3d53fe819694 
+Apr 09 12:37:48.953 HYPERVISOR: exec_cmd: vm get_status R2 
+Apr 09 12:37:59.443 HYPERVISOR: exec_cmd: nio create_gen_eth generic_ethernet-5237ff72-55a5-4340-9843-ec277b2cdf9e \Device\NPF_{021F6F48-F6D4-4BFF-BD3D-C7E1121122D8} 
+Apr 09 12:37:59.572 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 1 generic_ethernet-5237ff72-55a5-4340-9843-ec277b2cdf9e 
+Apr 09 12:37:59.572 HYPERVISOR: exec_cmd: vm get_status R2 
+Apr 09 12:38:39.058 HYPERVISOR: exec_cmd: vm get_status R2 
+Apr 09 12:38:39.076 HYPERVISOR: exec_cmd: vm start R2 
+Apr 09 13:08:39.974 HYPERVISOR: exec_cmd: vm get_status R2 
+Apr 09 13:08:39.976 HYPERVISOR: exec_cmd: vm slot_disable_nio R2 0 1 
+Apr 09 13:08:40.005 HYPERVISOR: exec_cmd: vm slot_remove_nio_binding R2 0 1 
+Apr 09 13:08:40.006 HYPERVISOR: exec_cmd: nio delete generic_ethernet-5237ff72-55a5-4340-9843-ec277b2cdf9e 
+Apr 09 13:08:53.963 HYPERVISOR: exec_cmd: nio create_udp udp-61ca954d-c878-45d9-9c12-4335bea3542b 10007 127.0.0.1 10006 
+Apr 09 13:08:53.966 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 1 udp-61ca954d-c878-45d9-9c12-4335bea3542b 
+Apr 09 13:08:53.966 HYPERVISOR: exec_cmd: vm get_status R2 
+Apr 09 13:08:53.966 HYPERVISOR: exec_cmd: vm slot_enable_nio R2 0 1 
+Apr 09 13:46:50.063 HYPERVISOR: exec_cmd: vm extract_config R2 
+Apr 09 13:47:03.826 HYPERVISOR: exec_cmd: vm get_status R2 
+Apr 09 13:47:03.828 HYPERVISOR: exec_cmd: vm stop R2 
+Apr 09 13:47:03.985 VM: VM R2 shutdown.

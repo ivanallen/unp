@@ -1,0 +1,21 @@
+Apr 09 12:36:25.773 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
+Apr 09 12:36:25.774 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 4015.
+Apr 09 12:36:26.254 HYPERVISOR: exec_cmd: hypervisor version 
+Apr 09 12:36:26.255 HYPERVISOR: exec_cmd: hypervisor uuid 
+Apr 09 12:36:26.255 HYPERVISOR: exec_cmd: hypervisor working_dir D:\Users\Ella\GNS3\projects\untitled\project-files\dynamips 
+Apr 09 12:36:26.256 GENERAL: working_dir=D:\Users\Ella\GNS3\projects\untitled\project-files\dynamips
+Apr 09 12:36:26.256 HYPERVISOR: exec_cmd: ethsw create SW1 
+Apr 09 12:37:35.920 HYPERVISOR: exec_cmd: nio create_gen_eth generic_ethernet-410256f4-a1ab-4cfb-9643-a752552bfe2a \Device\NPF_{021F6F48-F6D4-4BFF-BD3D-C7E1121122D8} 
+Apr 09 12:37:36.079 HYPERVISOR: exec_cmd: ethsw add_nio SW1 generic_ethernet-410256f4-a1ab-4cfb-9643-a752552bfe2a 
+Apr 09 12:37:36.096 HYPERVISOR: exec_cmd: ethsw set_access_port SW1 generic_ethernet-410256f4-a1ab-4cfb-9643-a752552bfe2a 1 
+Apr 09 12:37:42.617 HYPERVISOR: exec_cmd: nio create_udp udp-f72eb66c-991c-4208-9839-55d6c41c4b57 10000 127.0.0.1 10001 
+Apr 09 12:37:42.619 HYPERVISOR: exec_cmd: ethsw add_nio SW1 udp-f72eb66c-991c-4208-9839-55d6c41c4b57 
+Apr 09 12:37:42.636 HYPERVISOR: exec_cmd: ethsw set_access_port SW1 udp-f72eb66c-991c-4208-9839-55d6c41c4b57 1 
+Apr 09 13:08:36.032 HYPERVISOR: exec_cmd: ethsw remove_nio SW1 generic_ethernet-410256f4-a1ab-4cfb-9643-a752552bfe2a 
+Apr 09 13:08:36.065 HYPERVISOR: exec_cmd: nio delete generic_ethernet-410256f4-a1ab-4cfb-9643-a752552bfe2a 
+Apr 09 13:08:50.172 HYPERVISOR: exec_cmd: nio create_udp udp-e6c5d38a-e499-45b0-a8a6-2db9c3e587a6 10005 127.0.0.1 10004 
+Apr 09 13:08:50.213 HYPERVISOR: exec_cmd: ethsw add_nio SW1 udp-e6c5d38a-e499-45b0-a8a6-2db9c3e587a6 
+Apr 09 13:08:50.226 HYPERVISOR: exec_cmd: ethsw set_access_port SW1 udp-e6c5d38a-e499-45b0-a8a6-2db9c3e587a6 1 
+Apr 09 13:17:24.433 HYPERVISOR: exec_cmd: nio create_udp udp-0b6c68db-c337-4b1b-84d1-6b60228dca06 10009 127.0.0.1 10008 
+Apr 09 13:17:24.438 HYPERVISOR: exec_cmd: ethsw add_nio SW1 udp-0b6c68db-c337-4b1b-84d1-6b60228dca06 
+Apr 09 13:17:24.449 HYPERVISOR: exec_cmd: ethsw set_access_port SW1 udp-0b6c68db-c337-4b1b-84d1-6b60228dca06 1 
