@@ -35,6 +35,10 @@ int main(int argc, char* argv[]) {
   if (sockfd < 0) ERR_EXIT("socket");
   ret = setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &recvbufsize, sizeof(recvbufsize));
   if (ret < 0) ERR_EXIT("setsockopt");
+  n = sizeof(recvbufsize);
+  ret = getsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &recvbufsize, &n);
+  if (ret < 0) ERR_EXIT("getsockopt");
+  printf("actual recvbufsize: %d\n", recvbufsize);
 
 
   // 3. bind sockaddr
@@ -65,8 +69,8 @@ int main(int argc, char* argv[]) {
 
   // 7. send data
   while(1) {
-    sleep(1);
-    n = read(clientfd, buf, 512);
+    usleep(1000*500);
+    n = read(clientfd, buf, 1024);
     if (n == 0) {
       puts("peer closed");
       sleep(1);
