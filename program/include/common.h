@@ -13,6 +13,8 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/epoll.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
