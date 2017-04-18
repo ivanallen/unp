@@ -65,6 +65,7 @@ void server_routine() {
 			close(sockfd);
 			exit(0);
 		}
+		close(sockfd);
 	}
 }
 
