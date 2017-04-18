@@ -35,6 +35,7 @@ int main(int argc, char* argv[]) {
 
 void server_routine() {
 	int ret, listenfd, sockfd;
+	pid_t pid;
 	struct sockaddr_in servaddr, cliaddr;
 	socklen_t cliaddrlen;
 
@@ -50,13 +51,21 @@ void server_routine() {
 	ret = listen(listenfd, 5);
 	if (ret < 0) ERR_EXIT("listen");
 
-	cliaddrlen = sizeof cliaddr;
-  sockfd = accept(listenfd, (struct sockaddr*)&cliaddr, &cliaddrlen);
-	if (sockfd < 0) ERR_EXIT("accept");
-	printf("%s:%p come in\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+	while(1) {
+		cliaddrlen = sizeof cliaddr;
+		sockfd = accept(listenfd, (struct sockaddr*)&cliaddr, &cliaddrlen);
+		if (sockfd < 0) ERR_EXIT("accept");
+		printf("%s:%p come in\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 
-	doServer(sockfd);
-	close(sockfd);
+		pid = fork();
+		if (pid == 0) {
+			// child
+			close(listenfd);
+			doServer(sockfd);
+			close(sockfd);
+			exit(0);
+		}
+	}
 }
 
 void client_routine() {
@@ -73,6 +82,7 @@ void client_routine() {
 	if (ret < 0) ERR_EXIT("connect");
 
 	doClient(sockfd);
+
 	close(sockfd);
 }
 
