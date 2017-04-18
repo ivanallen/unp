@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <errno.h>
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
 
@@ -30,6 +31,11 @@ int main(int argc, char* argv[]) {
     if (buf[0] == 'q') break;
     write(sockfd, buf, strlen(buf));
     n = read(sockfd, buf, 63);
+		if (n < 0) {
+			if (errno == EINTR) continue;
+			perror("read error");
+			break;
+		}
     buf[n] = 0;
     puts(buf);
   }

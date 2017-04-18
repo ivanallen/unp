@@ -6,21 +6,19 @@
 
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
-char buf[1024];
-int recvbufsize = 4096;
-int print = 1;
+char buf[8192];
+int blocksize = 4096;
+int recvbufsize;
+int print = 0;
 
 int main(int argc, char* argv[]) {
   if (argc < 3) {
-    printf("Usage: %s <ip> <port> [recvbuf size] [print]\n", argv[0]);
+    printf("Usage: %s <ip> <port> [block size < 8192]\n", argv[0]);
     return 1;
   }
   if (argc >= 4) {
-    recvbufsize = atoi(argv[3]);
+    blocksize = atoi(argv[3]);
   }
-	if (argc >=5) {
-		print = atoi(argv[4]);
-	}
 
   struct sockaddr_in servaddr, cliaddr;
   int sockfd, clientfd, ret, n;
@@ -37,10 +35,6 @@ int main(int argc, char* argv[]) {
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) ERR_EXIT("socket");
 
-  if (recvbufsize != 0) {
-	  ret = setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &recvbufsize, sizeof(recvbufsize));
-	  if (ret < 0) ERR_EXIT("setsockopt");
-  }
   n = sizeof(recvbufsize);
   ret = getsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &recvbufsize, &n);
   if (ret < 0) ERR_EXIT("getsockopt");
@@ -75,8 +69,7 @@ int main(int argc, char* argv[]) {
 
   // 7. send data
   while(1) {
-    usleep(1000*500);
-    n = read(clientfd, buf, 1024);
+    n = read(clientfd, buf, blocksize);
     if (n == 0) {
       puts("peer closed");
       sleep(1);
@@ -88,6 +81,7 @@ int main(int argc, char* argv[]) {
         ERR_EXIT("read error");
       }
     }
+		printf("receive %d byte!\n", n);
 		if (print)
 			write(STDOUT_FILENO, buf, n);
   }
