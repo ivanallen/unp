@@ -7,4 +7,3 @@ images
 *.exe
 psh_serv
 sink_serv
-echo/*/echo
