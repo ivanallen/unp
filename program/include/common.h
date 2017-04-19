@@ -59,3 +59,5 @@ int readline(int fd, char* buf, int n);
 int writen(int fd, char* buf, int n);
 std::map<std::string, std::string> parsecmdline(int argc, char* argv[]);
 void toUpper(char* str, int n);
+void registSignal(int sig, void (*handler)(int));
+void ignoreSignal(int sig);

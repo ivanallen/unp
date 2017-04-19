@@ -11,13 +11,34 @@ struct Options {
 	int port;
 } g_option;
 
+void handler(int sig) {
+	pid_t pid;
+	int stat;
+
+	if (sig == SIGCHLD) {
+		puts("hello SIGCHLD");
+		while(1) {
+			pid = waitpid(-1, &stat, WNOHANG);
+			if (pid <= 0) break;
+			printf("child %d terminated\n", pid);
+		}
+	}
+	if (sig == SIGPIPE) {
+		puts("hello SIGPIPE");
+		exit(1);
+	}
+}
+
 int main(int argc, char* argv[]) {
+	struct sigaction sa;
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
 		printf("Usage:\n  %s [-s] <-h hostname> [-p port]\n", argv[0]);
 		return 1;
 	}
-
+  
+	registSignal(SIGCHLD, handler);
+	registSignal(SIGPIPE, handler);
 
 	SETBOOL(args, g_option.isServer, "s", 0);
 	SETSTR(args, g_option.hostname, "h", "0");
@@ -54,7 +75,13 @@ void server_routine() {
 	while(1) {
 		cliaddrlen = sizeof cliaddr;
 		sockfd = accept(listenfd, (struct sockaddr*)&cliaddr, &cliaddrlen);
-		if (sockfd < 0) ERR_EXIT("accept");
+		if (sockfd < 0) {
+			if (errno == EINTR) {
+				puts("accept interrupted by signal");
+				continue;
+			}
+			ERR_EXIT("accept");
+		}
 		printf("%s:%p come in\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 
 		pid = fork();
@@ -113,13 +140,11 @@ void doClient(int sockfd) {
 	char buf[4096];
 
 	while(fgets(buf, 4096, stdin)) {
-		// 如果对方此时已经关闭，第一次 write 后程序会收到 RST 
-		// 继续 write 会引发 SIGPIPE 信号
-		nw = writen(sockfd, buf, strlen(buf));
-		if (nw < strlen(buf)) puts("short write");
+		nw = writen(sockfd, buf, 1);
+		sleep(1);
+		nw = writen(sockfd, buf + 1, strlen(buf + 1));
+		if (nw < strlen(buf + 1)) puts("short write");
 
-		// 如果在 readline 时，RST 还没收到，它返回 0
-		// 如果此时收到了 RST，返回错误，连接被重置 
 		nr = readline(sockfd, buf, 4096);
 		if (nr == 0) {
 			puts("peer closed");
