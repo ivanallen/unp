@@ -144,7 +144,7 @@ void registSignal(int sig, void (*handler)(int)) {
 }
 
 void ignoreSignal(int sig) {
-	int ret;
+	void (*ret)(int);
 
 	ret = signal(sig, SIG_IGN);
 	if (ret == SIG_ERR) {
