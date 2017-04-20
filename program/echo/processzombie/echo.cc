@@ -99,6 +99,7 @@ void server_routine() {
 		}
 		close(sockfd);
 	}
+	close(listenfd);
 }
 
 void client_routine() {
