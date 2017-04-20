@@ -1,26 +1,35 @@
-Apr 09 13:47:35.377 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
-Apr 09 13:47:35.378 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 6407.
-Apr 09 13:47:35.721 HYPERVISOR: exec_cmd: hypervisor version 
-Apr 09 13:47:35.723 HYPERVISOR: exec_cmd: hypervisor uuid 
-Apr 09 13:47:35.726 HYPERVISOR: exec_cmd: hypervisor working_dir F:/blog/unp/gns3/demo01\project-files\dynamips 
-Apr 09 13:47:35.734 GENERAL: working_dir=F:/blog/unp/gns3/demo01\project-files\dynamips
-Apr 09 13:47:35.735 HYPERVISOR: exec_cmd: ethsw create SW1 
-Apr 09 13:47:35.876 HYPERVISOR: exec_cmd: nio create_udp udp-0b6bba12-56dd-4849-a581-1882bfd442a6 10003 127.0.0.1 10002 
-Apr 09 13:47:35.915 HYPERVISOR: exec_cmd: ethsw add_nio SW1 udp-0b6bba12-56dd-4849-a581-1882bfd442a6 
-Apr 09 13:47:35.926 HYPERVISOR: exec_cmd: ethsw set_access_port SW1 udp-0b6bba12-56dd-4849-a581-1882bfd442a6 1 
-Apr 09 13:47:35.932 HYPERVISOR: exec_cmd: nio create_udp udp-c628a443-2086-4f55-9311-d98a620245ab 10001 127.0.0.1 10000 
-Apr 09 13:47:35.947 HYPERVISOR: exec_cmd: ethsw add_nio SW1 udp-c628a443-2086-4f55-9311-d98a620245ab 
-Apr 09 13:47:35.968 HYPERVISOR: exec_cmd: ethsw set_access_port SW1 udp-c628a443-2086-4f55-9311-d98a620245ab 1 
-Apr 09 13:47:37.394 HYPERVISOR: exec_cmd: nio create_udp udp-1d16261d-fb45-46a3-8acd-5ee28c598f2c 10006 127.0.0.1 10007 
-Apr 09 13:47:37.400 HYPERVISOR: exec_cmd: ethsw add_nio SW1 udp-1d16261d-fb45-46a3-8acd-5ee28c598f2c 
-Apr 09 13:47:37.474 HYPERVISOR: exec_cmd: ethsw set_access_port SW1 udp-1d16261d-fb45-46a3-8acd-5ee28c598f2c 1 
-Apr 09 15:03:19.141 HYPERVISOR: exec_cmd: ethsw remove_nio SW1 udp-0b6bba12-56dd-4849-a581-1882bfd442a6 
-Apr 09 15:03:19.190 HYPERVISOR: exec_cmd: nio delete udp-0b6bba12-56dd-4849-a581-1882bfd442a6 
-Apr 09 15:03:19.193 HYPERVISOR: exec_cmd: ethsw remove_nio SW1 udp-c628a443-2086-4f55-9311-d98a620245ab 
-Apr 09 15:03:19.211 HYPERVISOR: exec_cmd: nio delete udp-c628a443-2086-4f55-9311-d98a620245ab 
-Apr 09 15:03:19.215 HYPERVISOR: exec_cmd: ethsw remove_nio SW1 udp-1d16261d-fb45-46a3-8acd-5ee28c598f2c 
-Apr 09 15:03:19.231 HYPERVISOR: exec_cmd: nio delete udp-1d16261d-fb45-46a3-8acd-5ee28c598f2c 
-Apr 09 15:03:19.234 HYPERVISOR: exec_cmd: ethsw delete SW1 
-Apr 09 15:03:19.235 HYPERVISOR: exec_cmd: hypervisor stop 
-Apr 09 15:03:19.650 HYPERVISOR: Stopped.
-Apr 09 15:03:19.650 GENERAL: reset done.
+Apr 14 13:01:34.253 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
+Apr 14 13:01:34.254 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 26912.
+Apr 14 13:01:34.680 HYPERVISOR: exec_cmd: hypervisor version 
+Apr 14 13:01:34.680 HYPERVISOR: exec_cmd: hypervisor uuid 
+Apr 14 13:01:34.681 HYPERVISOR: exec_cmd: hypervisor working_dir F:/blog/unp/protocol/gns3/demo01\project-files\dynamips 
+Apr 14 13:01:34.682 GENERAL: working_dir=F:/blog/unp/protocol/gns3/demo01\project-files\dynamips
+Apr 14 13:01:34.682 HYPERVISOR: exec_cmd: vm create PC3 5 c3600 
+Apr 14 13:01:34.684 VM: VM PC3 created.
+Apr 14 13:01:34.689 HYPERVISOR: exec_cmd: vm set_con_tcp_port PC3 2003 
+Apr 14 13:01:34.689 HYPERVISOR: exec_cmd: c3600 get_mac_addr PC3 
+Apr 14 13:01:34.690 HYPERVISOR: exec_cmd: vm get_status PC3 
+Apr 14 13:01:34.691 HYPERVISOR: exec_cmd: vm slot_add_binding PC3 1 0 NM-4T 
+Apr 14 13:01:34.692 HYPERVISOR: exec_cmd: vm get_status PC3 
+Apr 14 13:01:34.694 HYPERVISOR: exec_cmd: vm slot_add_binding PC3 0 0 NM-4E 
+Apr 14 13:01:34.696 HYPERVISOR: exec_cmd: vm set_ios PC3 G:\doc\CCNA\images\IOS\C3640-JK.BIN 
+Apr 14 13:01:34.698 HYPERVISOR: exec_cmd: vm set_exec_area PC3 64 
+Apr 14 13:01:34.699 HYPERVISOR: exec_cmd: vm set_ram PC3 192 
+Apr 14 13:01:34.701 HYPERVISOR: exec_cmd: vm get_status PC3 
+Apr 14 13:01:34.702 HYPERVISOR: exec_cmd: vm set_idle_pc PC3 0x6046d710 
+Apr 14 13:01:34.702 HYPERVISOR: exec_cmd: vm set_nvram PC3 256 
+Apr 14 13:01:34.705 HYPERVISOR: exec_cmd: c3600 set_mac_addr PC3 cc05.0d78.0000 
+Apr 14 13:01:34.707 HYPERVISOR: exec_cmd: vm set_config PC3 configs/i5_startup-config.cfg 
+Apr 14 13:01:36.798 HYPERVISOR: exec_cmd: vm set_ghost_status PC3 2 
+Apr 14 13:01:36.799 HYPERVISOR: exec_cmd: vm set_ghost_file PC3 C3640-JK.BIN-192.ghost 
+Apr 14 13:01:37.167 HYPERVISOR: exec_cmd: nio create_udp udp-121f46d8-24fc-4b1c-a128-10a670f8d843 10007 127.0.0.1 10006 
+Apr 14 13:01:37.205 HYPERVISOR: exec_cmd: vm slot_add_nio_binding PC3 0 0 udp-121f46d8-24fc-4b1c-a128-10a670f8d843 
+Apr 14 13:01:37.267 HYPERVISOR: exec_cmd: vm get_status PC3 
+Apr 14 13:01:56.767 HYPERVISOR: exec_cmd: vm extract_config PC3 
+Apr 14 19:52:21.093 HYPERVISOR: exec_cmd: vm get_status PC3 
+Apr 14 19:52:21.161 HYPERVISOR: exec_cmd: vm extract_config PC3 
+Apr 14 19:52:21.193 HYPERVISOR: exec_cmd: vm delete PC3 
+Apr 14 19:52:21.237 VM: VM PC3 destroyed.
+Apr 14 19:52:21.271 HYPERVISOR: exec_cmd: hypervisor stop 
+Apr 14 19:52:21.394 HYPERVISOR: Stopped.
+Apr 14 19:52:21.395 GENERAL: reset done.

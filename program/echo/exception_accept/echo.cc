@@ -56,7 +56,9 @@ void server_routine() {
 	if (g_option.isLinger) sleep(10);
 
 	cliaddrlen = sizeof cliaddr;
+	puts("accepting...");
   sockfd = accept(listenfd, (struct sockaddr*)&cliaddr, &cliaddrlen);
+	printf("accepted, return %d\n", sockfd);
 	if (sockfd < 0) {
 		if (errno == ECONNABORTED) puts("accept: connect reset by peer");
 		ERR_EXIT("accept");

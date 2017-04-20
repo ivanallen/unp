@@ -82,7 +82,7 @@ void server_routine() {
 			}
 			ERR_EXIT("accept");
 		}
-		printf("%s:%p come in\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+		printf("%s:%d come in\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 
 		pid = fork();
 		if (pid == 0) {

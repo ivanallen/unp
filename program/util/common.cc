@@ -137,8 +137,21 @@ void toUpper(char* str, int n) {
 }
 
 
+void registSignal(int sig, void (*handler)(int)) {
+	struct sigaction sa;
+	sa.sa_handler = handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	if (sigaction(sig, &sa, NULL) < 0) {
+		ERR_EXIT("sigaction");
+	}
+}
 
+void ignoreSignal(int sig) {
+	void (*ret)(int);
 
-
-
-
+	ret = signal(sig, SIG_IGN);
+	if (ret == SIG_ERR) {
+		ERR_EXIT("ignoreSignal");
+	}
+}
