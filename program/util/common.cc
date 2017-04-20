@@ -51,9 +51,13 @@ int writen(int fd, char* buf, int n) {
 	nwrite = 0;
 	while(nwrite < n) {
 		len = write(fd, buf + nwrite, n - nwrite);
-		if (len <= 0) {
+		if (len < 0) {
 			if (errno == EINTR) continue;
 			return -1;
+		}
+		else if (len == 0) {
+			// short write
+			break;
 		}
 
 		nwrite += len;
