@@ -54,7 +54,10 @@ void server_routine() {
 	while(1) {
 		cliaddrlen = sizeof cliaddr;
 		sockfd = accept(listenfd, (struct sockaddr*)&cliaddr, &cliaddrlen);
-		if (sockfd < 0) ERR_EXIT("accept");
+		if (sockfd < 0) {
+			if (errno == ECONNABORTED) puts("accept: connect reset by peer");
+			ERR_EXIT("accept");
+		}
 		printf("%s:%d come in\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 
 		pid = fork();
@@ -67,6 +70,7 @@ void server_routine() {
 		}
 		close(sockfd);
 	}
+	close(listenfd);
 }
 
 void client_routine() {
@@ -97,7 +101,13 @@ void doServer(int sockfd) {
 			puts("peer closed");
 			break;
 		}
-		else if (nr < 0) ERR_EXIT("readline");
+		else if (nr < 0) {
+			if (errno == ECONNRESET) {
+				puts("readline: reset by peer");
+				break;
+			}
+			ERR_EXIT("readline");
+		}
 
 		toUpper(buf, nr);
 
