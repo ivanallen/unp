@@ -11,9 +11,8 @@ void client_routine();
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
 	if (args.empty() 
-			|| !CONTAINS(args, "n")
 			|| !CONTAINS(args, "h")) {
-    printf("Usage:\n  %s [-s] <-h hostname> [-p port] <-n conn-number>\n", argv[0]);
+    printf("Usage:\n  %s [-s] <-h hostname> [-p port] [-n conn-number]\n", argv[0]);
 		return 1;
 	}
 
