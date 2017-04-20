@@ -92,6 +92,11 @@ void server_routine() {
 			close(sockfd);
 			exit(0);
 		}
+		else if (pid < 0) {
+		  perror("fork");	
+			close(sockfd);
+			break;
+		}
 		close(sockfd);
 	}
 }
