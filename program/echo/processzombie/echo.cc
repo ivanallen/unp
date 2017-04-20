@@ -76,8 +76,8 @@ void server_routine() {
 		cliaddrlen = sizeof cliaddr;
 		sockfd = accept(listenfd, (struct sockaddr*)&cliaddr, &cliaddrlen);
 		if (sockfd < 0) {
-			if (errno == EINTR) {
-				puts("accept interrupted by signal");
+			if (errno == ECONNABORTED || errno == EINTR) {
+				perror("accept");
 				continue;
 			}
 			ERR_EXIT("accept");
@@ -130,7 +130,13 @@ void doServer(int sockfd) {
 			puts("peer closed");
 			break;
 		}
-		else if (nr < 0) ERR_EXIT("readline");
+		else if (nr < 0) {
+			if (errno = ECONNRESET) {
+				perror("readline");
+				break;
+			}
+			ERR_EXIT("readline");
+		}
 
 		toUpper(buf, nr);
 

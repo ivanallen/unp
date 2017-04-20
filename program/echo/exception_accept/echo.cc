@@ -67,6 +67,7 @@ void server_routine() {
 
 	doServer(sockfd);
 	close(sockfd);
+	close(listenfd);
 }
 
 void client_routine() {
