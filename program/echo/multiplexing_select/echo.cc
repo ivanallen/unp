@@ -176,21 +176,41 @@ void doServer(int sockfd) {
 }
 
 void doClient(int sockfd) {
-
-	int nr, nw;
+  fd_set rfds, fds;
+	int nr, nw, nready, maxfd;
 	char buf[4096];
 
-	while(fgets(buf, 4096, stdin)) {
-		nw = writen(sockfd, buf, strlen(buf));
-		if (nw < strlen(buf)) puts("short write");
+	FD_ZERO(&rfds);
+	FD_SET(STDIN_FILENO, &rfds);
+	FD_SET(sockfd, &rfds);
+	maxfd = sockfd;
 
-		nr = readline(sockfd, buf, 4096);
-		if (nr == 0) {
-			puts("peer closed");
-			break;
+	while(1) {
+		fds = rfds;
+		nready = select(maxfd + 1, &fds, NULL, NULL, NULL);
+		if (nready < 0) {
+			if (nready == EINTR || nready == ECONNRESET) continue;
 		}
-		else if (nr < 0) ERR_EXIT("readline");
+		else if (nready == 0) continue;
 
-		write(STDOUT_FILENO, buf, nr);
+		if (FD_ISSET(STDIN_FILENO, &fds)) {
+			if (fgets(buf, 4096, stdin) != NULL) {
+				nw = writen(sockfd, buf, strlen(buf));
+				if (nw < strlen(buf)) puts("short write");
+			}
+			else {
+				break;
+			}
+		}
+
+		if (FD_ISSET(sockfd, &fds)) {
+			nr = readline(sockfd, buf, 4096);
+			if (nr == 0) {
+				puts("peer closed");
+				break;
+			}
+			else if (nr < 0) ERR_EXIT("readline");
+			write(STDOUT_FILENO, buf, nr);
+		}
 	}
 }
