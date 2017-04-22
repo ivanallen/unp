@@ -9,7 +9,7 @@ struct Option{
 void server_routine();
 void client_routine();
 int doAccept(int listenfd, int clifds[], int n);
-void doServer(int sockfd);
+int doServer(int sockfd);
 void doClient(int sockfd);
 int makefdset(int clifds[], int n, fd_set *fds);
 
@@ -68,18 +68,22 @@ void server_routine() {
 			if (ret < 0) {
 				puts("Too many open files!");
 			}
+			// 如果 nready <= 0，表示 IO 事件已经处理完，后面就没必要再遍历了
 			if (--nready <= 0) continue;
 		}
 
 		for (i = 0; i < FD_SETSIZE; ++i) {
 			if (clifds[i] != -1 && FD_ISSET(clifds[i], &rfds)) {
-				doServer(clifds[i]);
-				FD_CLR(clifds[i], &fds);
-				close(clifds[i]);
-				clifds[i] = -1;
+				ret = doServer(clifds[i]);
+				// ret == 0 表示对端关闭
+				if (ret == 0) {
+					FD_CLR(clifds[i], &fds);
+					close(clifds[i]);
+					clifds[i] = -1;
+				}
         // nready 是发生 IO 事件的个数，每处理一个，就将其减 1，
 				// 如果 nready <= 0，表示 IO 事件已经处理完，后面就没必要再遍历了
-				if (--nready <= 0) continue;
+				if (--nready <= 0) break;
 			}
 		}
 	}
@@ -148,31 +152,30 @@ int makefdset(int clifds[], int n, fd_set *fds) {
 	return maxfd;
 }
 
-void doServer(int sockfd) {
+// return 0: peer close;
+int doServer(int sockfd) {
 	int nr, nw;
 	char buf[4096];
 
-	while(1) {
-		nr = readline(sockfd, buf, 4096);
-		if (nr == 0) {
-			puts("peer closed");
-			break;
-		}
-		else if (nr < 0) {
-			if (errno = ECONNRESET) {
-				perror("readline");
-				break;
-			}
-			ERR_EXIT("readline");
-		}
-
-		toUpper(buf, nr);
-
-		nw = writen(sockfd, buf, nr);
-		if (nw < nr) {
-			puts("short write");
-		}
+	nr = readline(sockfd, buf, 4096);
+	if (nr == 0) {
+		puts("peer closed");
+		return 0;
 	}
+	else if (nr < 0) {
+		if (errno = ECONNRESET) {
+			perror("readline");
+		}
+		ERR_EXIT("readline");
+	}
+
+	toUpper(buf, nr);
+
+	nw = writen(sockfd, buf, nr);
+	if (nw < nr) {
+		puts("short write");
+	}
+	return 1;
 }
 
 void doClient(int sockfd) {
