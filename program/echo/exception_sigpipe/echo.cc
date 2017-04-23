@@ -141,7 +141,7 @@ void doClient(int sockfd) {
 
 	while(fgets(buf, 4096, stdin)) {
 		nw = writen(sockfd, buf, 1);
-		sleep(1);
+		sleep(1);// 等待 1 秒，保证收到 RST 段
 		nw = writen(sockfd, buf + 1, strlen(buf + 1));
 		if (nw < strlen(buf + 1)) puts("short write");
 
