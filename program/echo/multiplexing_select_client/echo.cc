@@ -23,6 +23,10 @@ void handler(int sig) {
 			printf("child %d terminated\n", pid);
 		}
 	}
+	if (sig == SIGPIPE) {
+		puts("hello SIGPIPE");
+		exit(1);
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -33,12 +37,9 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	sa.sa_handler = handler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	if (sigaction(SIGCHLD, &sa, NULL) < 0) {
-		ERR_EXIT("sigaction");
-	}
+	
+	registSignal(SIGCHLD, handler);
+	registSignal(SIGPIPE, handler);
 
 	SETBOOL(args, g_option.isServer, "s", 0);
 	SETSTR(args, g_option.hostname, "h", "0");
@@ -142,7 +143,7 @@ void doServer(int sockfd) {
 
 		nw = writen(sockfd, buf, nr);
 		if (nw < nr) {
-			puts("short write");
+			perror("short write");
 		}
 	}
 }
@@ -168,7 +169,9 @@ void doClient(int sockfd) {
 		if (FD_ISSET(STDIN_FILENO, &fds)) {
 			if (fgets(buf, 4096, stdin) != NULL) {
 				nw = writen(sockfd, buf, strlen(buf));
-				if (nw < strlen(buf)) puts("short write");
+				if (nw < strlen(buf)) {
+					perror("short write");
+				}
 			}
 			else {
 				break;
