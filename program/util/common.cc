@@ -57,6 +57,7 @@ int writen(int fd, char* buf, int n) {
 		}
 		else if (len == 0) {
 			// short write
+			puts("write return 0");
 			break;
 		}
 
