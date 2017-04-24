@@ -4,7 +4,7 @@
  * 说明：如果提示缺少 netinet/sctp.h 文件，说明你的系统没有相关的 sctp 开发环境，按照下面的方式安装：
  *
  * ubuntu: sudo apt-get install libsctp-dev
- * centos 64: sudo yum install lksctp-tools-devel.x86_x64
+ * centos 64: sudo yum install lksctp-tools-devel.x86_64
  * centos 32: sudo yum install lksctp-tools-devel.i686
  */
 
