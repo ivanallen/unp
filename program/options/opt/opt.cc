@@ -22,8 +22,8 @@ int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
 		printf("Usage:\n  %s [-s] <-h hostname> [-p port] [--reuse] "
-				"[--linger seconds] [--slowread number (only server)]\n"
-				"[--useclose]", argv[0]);
+				"[--linger seconds] [--slowread number (only server)] "
+				"[--useclose]\n", argv[0]);
 		return 1;
 	}
 
