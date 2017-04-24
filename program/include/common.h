@@ -70,3 +70,5 @@ void toUpper(char* str, int n);
 void registSignal(int sig, void (*handler)(int));
 void ignoreSignal(int sig);
 void showopts(char* opt);
+void reuseAddr(int sockfd, int onoff); 
+void setLinger(int sockfd, int onoff, int seconds);

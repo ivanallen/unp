@@ -182,3 +182,25 @@ void ignoreSignal(int sig) {
 		ERR_EXIT("ignoreSignal");
 	}
 }
+
+void reuseAddr(int sockfd, int onoff) {
+	int ret, reuse;
+	reuse = (onoff == 0) ? 0 : 1;
+  ret = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+	if (ret < 0) {
+		ERR_EXIT("reuseAddr");
+	}
+}
+
+void setLinger(int sockfd, int onoff, int seconds) {
+	int ret;
+	struct linger lgr;
+
+	lgr.l_onoff = onoff;
+	lgr.l_linger = seconds;
+
+	ret = setsockopt(sockfd, SOL_SOCKET, SO_LINGER, &lgr, sizeof(lgr));
+	if (ret < 0) {
+		ERR_EXIT("setLinger");
+	}
+}
