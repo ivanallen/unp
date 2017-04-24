@@ -62,7 +62,8 @@ void server_routine() {
 			ERR_EXIT("select");
 		}
 		if (nready == 0) continue;
-    
+   
+	  // 对监听套接字做单独处理	
 		if (FD_ISSET(listenfd, &rfds)) {
 			ret = doAccept(listenfd, clifds, FD_SETSIZE);
 			if (ret < 0) {
@@ -72,6 +73,7 @@ void server_routine() {
 			if (--nready <= 0) continue;
 		}
 
+		// 处理服务器收到的数据
 		for (i = 0; i < FD_SETSIZE; ++i) {
 			if (clifds[i] != -1 && FD_ISSET(clifds[i], &rfds)) {
 				ret = doServer(clifds[i]);
@@ -132,7 +134,7 @@ void client_routine() {
 
 	doClient(sockfd);
 
-	close(sockfd);
+	// close(sockfd);
 }
 
 // return maxfd
@@ -180,8 +182,10 @@ int doServer(int sockfd) {
 
 void doClient(int sockfd) {
   fd_set rfds, fds;
-	int nr, nw, nready, maxfd;
+	int nr, nw, nready, maxfd, stdinclosed, ret;
 	char buf[4096];
+
+	stdinclosed = 0;
 
 	FD_ZERO(&rfds);
 	FD_SET(STDIN_FILENO, &rfds);
@@ -197,19 +201,36 @@ void doClient(int sockfd) {
 		else if (nready == 0) continue;
 
 		if (FD_ISSET(STDIN_FILENO, &fds)) {
-			if (fgets(buf, 4096, stdin) != NULL) {
-				nw = writen(sockfd, buf, strlen(buf));
-				if (nw < strlen(buf)) puts("short write");
+			// fgets 带有缓冲区，与 select 一起使用太危险，换成 iread，就是对 read 包装了一下。
+			nr = iread(STDIN_FILENO, buf, 4096);
+			if (nr > 0) {
+				nw = writen(sockfd, buf, nr);
+				if (nw < nr) {
+					perror("short write");
+				}
+			}
+			else if (nr == 0){
+				// 不直接 break
+				shutdown(sockfd, SHUT_WR);
+				FD_CLR(STDIN_FILENO, &rfds);
+				stdinclosed = 1;
 			}
 			else {
-				break;
+				ERR_EXIT("iread");
 			}
 		}
 
 		if (FD_ISSET(sockfd, &fds)) {
+			// 这里的 readline 函数没有缓冲，没关系
 			nr = readline(sockfd, buf, 4096);
 			if (nr == 0) {
-				puts("peer closed");
+				if (stdinclosed) {
+					fputs("peer closed\n", stderr);
+				}
+				else {
+					// 服务器非正常关闭
+					fputs("server exception!\n", stderr);
+				}
 				break;
 			}
 			else if (nr < 0) ERR_EXIT("readline");
