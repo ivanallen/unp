@@ -5,6 +5,7 @@ void doClient(int);
 void server_routine();
 void client_routine();
 void setopt(int);
+void handler(int sig);
 
 struct Options {
 	int isServer;
@@ -13,36 +14,16 @@ struct Options {
 	int reuse;
 	int linger;
 	int slowread;
+	int useclose;
 } g_option;
-
-void handler(int sig) {
-	pid_t pid;
-	int stat;
-
-	if (sig == SIGCHLD) {
-		puts("hello SIGCHLD");
-		while(1) {
-			pid = waitpid(-1, &stat, WNOHANG);
-			if (pid <= 0) break;
-			printf("child %d terminated\n", pid);
-		}
-	}
-	if (sig == SIGPIPE) {
-		puts("hello SIGPIPE");
-		exit(1);
-	}
-	if (sig == SIGQUIT) {
-		puts("hello SIGUQIT, now go on...");
-		g_option.slowread= -1;
-	}
-}
 
 int main(int argc, char* argv[]) {
 	struct sigaction sa;
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
 		printf("Usage:\n  %s [-s] <-h hostname> [-p port] [--reuse] "
-				"[--linger seconds] [--slowread number (only server)]\n", argv[0]);
+				"[--linger seconds] [--slowread number (only server)]\n"
+				"[--useclose]", argv[0]);
 		return 1;
 	}
 
@@ -57,6 +38,7 @@ int main(int argc, char* argv[]) {
 	SETBOOL(args, g_option.reuse, "reuse", 0);
 	SETINT(args, g_option.slowread, "slowread", -1);
 	SETINT(args, g_option.linger, "linger", -1);
+	SETBOOL(args, g_option.reuse, "useclose", 0);
 
 	if (g_option.isServer) {
 		server_routine();
@@ -144,7 +126,7 @@ void doServer(int sockfd) {
 
 
 	while(g_option.slowread != -1) {
-		sleep(5);
+		sleep(2);
 		if (g_option.slowread > 0) {
 			nr = iread(sockfd, buf, g_option.slowread);
 			if (nr < 0) {
@@ -208,7 +190,7 @@ void doClient(int sockfd) {
 			}
 			else if (nr == 0){
 				// 不直接 break
-				if (g_option.linger >= 0) {
+				if (g_option.linger >= 0 || g_option.useclose) {
 					ret = close(sockfd);
 					printf("close return %d\n", ret);
 					break;
@@ -253,3 +235,26 @@ void setopt(int sockfd) {
 		setLinger(sockfd, 1, g_option.linger);
 	}
 }
+
+void handler(int sig) {
+	pid_t pid;
+	int stat;
+
+	if (sig == SIGCHLD) {
+		puts("hello SIGCHLD");
+		while(1) {
+			pid = waitpid(-1, &stat, WNOHANG);
+			if (pid <= 0) break;
+			printf("child %d terminated\n", pid);
+		}
+	}
+	if (sig == SIGPIPE) {
+		puts("hello SIGPIPE");
+		exit(1);
+	}
+	if (sig == SIGQUIT) {
+		puts("hello SIGUQIT, now go on...");
+		g_option.slowread= -1;
+	}
+}
+
