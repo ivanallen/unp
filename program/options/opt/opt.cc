@@ -150,6 +150,7 @@ void doServer(int sockfd) {
 			if (nr < 0) {
 				ERR_EXIT("iread");
 			}
+			printf("read %d bytes...\n", nr);
 		}
 	}
 
