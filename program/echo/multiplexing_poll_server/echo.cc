@@ -75,9 +75,9 @@ void server_routine() {
 					puts("Too many open files!");
 				}
 				// 如果 nready <= 0，表示 IO 事件已经处理完，后面就没必要再遍历了
-				if (--nready <= 0) continue;
+				if (--nready <= 0) break;
 			}
-			else if (fds[i].revents & EPOLLIN) {
+			else if (fds[i].revents & POLLIN) {
 				ret = doServer(fds[i].fd);
 				// ret == 0 表示对端关闭
 				if (ret == 0) {
