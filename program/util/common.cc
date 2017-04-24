@@ -46,7 +46,7 @@ int readn(int fd, char* buf, int n) {
 	return nread;
 }
 
-int writen(int fd, char* buf, int n) {
+int writen(int fd, const char* buf, int n) {
 	int len, nwrite;
 	nwrite = 0;
 	while(nwrite < n) {
@@ -66,6 +66,32 @@ int writen(int fd, char* buf, int n) {
 	return nwrite;
 }
 
+// ignore interrupted by signal
+int iread(int fd, char* buf, int n) {
+	int ret;
+  while(1) {
+		ret = read(fd, buf, n);
+		if (ret < 0) {
+			if (errno == EINTR) continue;
+			return -1;
+		}
+		break;
+	}
+	return ret;
+}
+
+int iwrite(int fd, const char* buf, int n) {
+	int ret;
+	while(1) {
+		ret = write(fd, buf, n);
+		if (ret < 0) {
+			if (errno == EINTR) continue;
+			return -1;
+		}
+		break;
+	}
+	return ret;
+}
 
 std::map<std::string, std::string> parsecmdline(int argc, char* argv[]) {
   int i;
