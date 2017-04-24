@@ -20,6 +20,7 @@
 #include <sys/epoll.h>
 #include <poll.h>
 #include <limits.h>
+#include <netinet/tcp.h>
 
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
@@ -68,3 +69,4 @@ std::map<std::string, std::string> parsecmdline(int argc, char* argv[]);
 void toUpper(char* str, int n);
 void registSignal(int sig, void (*handler)(int));
 void ignoreSignal(int sig);
+void showopts(char* opt);
