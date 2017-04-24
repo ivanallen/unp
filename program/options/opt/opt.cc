@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
 	SETBOOL(args, g_option.reuse, "reuse", 0);
 	SETINT(args, g_option.slowread, "slowread", -1);
 	SETINT(args, g_option.linger, "linger", -1);
-	SETBOOL(args, g_option.reuse, "useclose", 0);
+	SETBOOL(args, g_option.useclose, "useclose", 0);
 
 	if (g_option.isServer) {
 		server_routine();
@@ -131,6 +131,10 @@ void doServer(int sockfd) {
 			nr = iread(sockfd, buf, g_option.slowread);
 			if (nr < 0) {
 				ERR_EXIT("iread");
+			}
+			if (nr == 0) {
+				fputs("peer closed", stderr);
+				return;
 			}
 			printf("read %d bytes...\n", nr);
 		}
