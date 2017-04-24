@@ -12,7 +12,7 @@ struct Options {
 	int port;
 	int reuse;
 	int linger;
-	int unread;
+	int slowread;
 } g_option;
 
 void handler(int sig) {
@@ -33,7 +33,7 @@ void handler(int sig) {
 	}
 	if (sig == SIGQUIT) {
 		puts("hello SIGUQIT, now go on...");
-		g_option.unread = 0;
+		g_option.slowread= -1;
 	}
 }
 
@@ -41,7 +41,8 @@ int main(int argc, char* argv[]) {
 	struct sigaction sa;
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
-		printf("Usage:\n  %s [-s] <-h hostname> [-p port] [--reuse] [--linger seconds] [--unread (only server)]\n", argv[0]);
+		printf("Usage:\n  %s [-s] <-h hostname> [-p port] [--reuse] "
+				"[--linger seconds] [--slowread number (only server)]\n", argv[0]);
 		return 1;
 	}
 
@@ -54,7 +55,7 @@ int main(int argc, char* argv[]) {
 	SETSTR(args, g_option.hostname, "h", "0");
 	SETINT(args, g_option.port, "p", 8000);
 	SETBOOL(args, g_option.reuse, "reuse", 0);
-	SETBOOL(args, g_option.unread, "unread", 0);
+	SETINT(args, g_option.slowread, "slowread", -1);
 	SETINT(args, g_option.linger, "linger", -1);
 
 	if (g_option.isServer) {
@@ -141,8 +142,15 @@ void doServer(int sockfd) {
 	int nr, nw;
 	char buf[4096];
 
-	while (g_option.unread) {
-		sleep(1);
+
+	while(g_option.slowread != -1) {
+		sleep(5);
+		if (g_option.slowread > 0) {
+			nr = iread(sockfd, buf, g_option.slowread);
+			if (nr < 0) {
+				ERR_EXIT("iread");
+			}
+		}
 	}
 
 	while(1) {
@@ -199,9 +207,16 @@ void doClient(int sockfd) {
 			}
 			else if (nr == 0){
 				// 不直接 break
-				shutdown(sockfd, SHUT_WR);
-				FD_CLR(STDIN_FILENO, &rfds);
-				stdinclosed = 1;
+				if (g_option.linger >= 0) {
+					ret = close(sockfd);
+					printf("close return %d\n", ret);
+					break;
+				}
+				else {
+					shutdown(sockfd, SHUT_WR);
+					FD_CLR(STDIN_FILENO, &rfds);
+					stdinclosed = 1;
+				}
 			}
 			else {
 				ERR_EXIT("iread");
@@ -233,6 +248,7 @@ void setopt(int sockfd) {
 		reuseAddr(sockfd, 1);
 	}
 	if (g_option.linger >= 0) {
+		printf("set linger: {on %ds}\n", g_option.linger);
 		setLinger(sockfd, 1, g_option.linger);
 	}
 }
