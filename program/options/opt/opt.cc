@@ -121,10 +121,11 @@ void client_routine() {
 }
 
 void doServer(int sockfd) {
-	int nr, nw;
+	int nr, nw, total;
 	char buf[4096];
 
 
+	total = 0;
 	while(g_option.slowread != -1) {
 		sleep(2);
 		if (g_option.slowread > 0) {
@@ -133,9 +134,11 @@ void doServer(int sockfd) {
 				ERR_EXIT("iread");
 			}
 			if (nr == 0) {
-				fputs("peer closed", stderr);
+				printf("%d bytes received\n", total);
+				fputs("peer closed\n", stderr);
 				return;
 			}
+			total += nr;
 			printf("read %d bytes...\n", nr);
 		}
 	}
