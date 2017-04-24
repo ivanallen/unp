@@ -17,6 +17,8 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/select.h>
+#include <poll.h>
+#include <limits.h>
 
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
