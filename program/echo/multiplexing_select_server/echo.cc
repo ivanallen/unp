@@ -8,10 +8,10 @@ struct Option{
 
 void server_routine();
 void client_routine();
-int doAccept(int listenfd, int clifds[], int n);
+int doAccept(int listenfd, int fds[], int n);
 int doServer(int sockfd);
 void doClient(int sockfd);
-int makefdset(int clifds[], int n, fd_set *fds);
+int makefdset(int fds[], int n, fd_set *fdst);
 
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
@@ -33,9 +33,9 @@ int main(int argc, char* argv[]) {
 }
 
 void server_routine() {
-	int i, ret, nready, maxfd, listenfd, sockfd, clifds[FD_SETSIZE];
+	int i, ret, nready, maxfd, listenfd, sockfd, fds[FD_SETSIZE];
 	struct sockaddr_in servaddr;
-	fd_set fds, rfds;
+	fd_set rfds;
 
 	ret = resolve(g_option.hostname, g_option.port, &servaddr);
 	if (ret < 0) ERR_EXIT("resolve");
@@ -49,13 +49,13 @@ void server_routine() {
 	ret = listen(listenfd, 5);
 	if (ret < 0) ERR_EXIT("listen");
 
-	// initialize clifds array. -1 means empty
-	for (i = 0; i < FD_SETSIZE; ++i) clifds[i] = -1;
-	clifds[0] = listenfd;
+	// initialize fds array. -1 means empty
+	for (i = 0; i < FD_SETSIZE; ++i) fds[i] = -1;
 
+	fds[0] = listenfd;
 
 	while(1) {
-		maxfd = makefdset(clifds, FD_SETSIZE, &rfds);
+		maxfd = makefdset(fds, FD_SETSIZE, &rfds);
     nready = select(maxfd + 1, &rfds, NULL, NULL, NULL);
 		if (nready < 0) {
 			if (errno == EINTR) continue;
@@ -65,7 +65,7 @@ void server_routine() {
    
 	  // 对监听套接字做单独处理	
 		if (FD_ISSET(listenfd, &rfds)) {
-			ret = doAccept(listenfd, clifds, FD_SETSIZE);
+			ret = doAccept(listenfd, fds, FD_SETSIZE);
 			if (ret < 0) {
 				puts("Too many open files!");
 			}
@@ -75,13 +75,13 @@ void server_routine() {
 
 		// 处理服务器收到的数据
 		for (i = 0; i < FD_SETSIZE; ++i) {
-			if (clifds[i] != -1 && FD_ISSET(clifds[i], &rfds)) {
-				ret = doServer(clifds[i]);
+			if (fds[i] != -1 && FD_ISSET(fds[i], &rfds)) {
+				ret = doServer(fds[i]);
 				// ret == 0 表示对端关闭
 				if (ret == 0) {
-					FD_CLR(clifds[i], &fds);
-					close(clifds[i]);
-					clifds[i] = -1;
+					// FD_CLR(fds[i], &rfds);
+					close(fds[i]);
+					fds[i] = -1;
 				}
         // nready 是发生 IO 事件的个数，每处理一个，就将其减 1，
 				// 如果 nready <= 0，表示 IO 事件已经处理完，后面就没必要再遍历了
@@ -91,7 +91,7 @@ void server_routine() {
 	}
 }
 
-int doAccept(int listenfd, int clifds[], int n) {
+int doAccept(int listenfd, int fds[], int n) {
 	int sockfd, i;
 	struct sockaddr_in cliaddr;
 	socklen_t cliaddrlen;
@@ -106,8 +106,8 @@ int doAccept(int listenfd, int clifds[], int n) {
 
 	printf("%s:%d come in\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 	for (i = 0; i < FD_SETSIZE; ++i) {
-		if (clifds[i] == -1) { 
-			clifds[i] = sockfd;
+		if (fds[i] == -1) { 
+			fds[i] = sockfd;
 			break;
 		}
 	}
@@ -138,16 +138,16 @@ void client_routine() {
 }
 
 // return maxfd
-int makefdset(int clifds[], int n, fd_set *fds) {
+int makefdset(int fds[], int n, fd_set *fdst) {
 	int i, maxfd;
 
 	maxfd = 0;
-	FD_ZERO(fds);
+	FD_ZERO(fdst);
 
 	for (i = 0; i < n; ++i) {
-		if (clifds[i] != -1) {
-      FD_SET(clifds[i], fds);
-			if (clifds[i] > maxfd) maxfd = clifds[i];
+		if (fds[i] != -1) {
+      FD_SET(fds[i], fdst);
+			if (fds[i] > maxfd) maxfd = fds[i];
 		}
 	}
 
