@@ -170,14 +170,14 @@ void doClient(int sockfd) {
 
 		if (FD_ISSET(STDIN_FILENO, &fds)) {
 			// fgets 带有缓冲区，与 select 一起使用太危险，换成 iread，就是对 read 包装了一下。
-			ret = iread(STDIN_FILENO, buf, 4096);
-			if (ret > 0) {
-				nw = writen(sockfd, buf, strlen(buf));
-				if (nw < strlen(buf)) {
+			nr = iread(STDIN_FILENO, buf, 4096);
+			if (nr > 0) {
+				nw = writen(sockfd, buf, nr);
+				if (nw < nr) {
 					perror("short write");
 				}
 			}
-			else if (ret == 0){
+			else if (nr == 0){
 				// 不直接 break
 				shutdown(sockfd, SHUT_WR);
 				FD_CLR(STDIN_FILENO, &rfds);
