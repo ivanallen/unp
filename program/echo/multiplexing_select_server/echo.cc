@@ -16,7 +16,7 @@ int makefdset(int fds[], int n, fd_set *fdst);
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
 	if (args.empty() || !CONTAINS(args, "h")) {
-		printf("Usage:\n  %s [-s] <-h hostname> [-p port]\n");
+		printf("Usage:\n  %s [-s] <-h hostname> [-p port]\n", argv[0]);
 	}
 
 	SETSTR(args, g_option.hostname, "h", "0");
