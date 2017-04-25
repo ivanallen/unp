@@ -4,8 +4,8 @@
  * 说明：如果提示缺少 netinet/sctp.h 文件，说明你的系统没有相关的 sctp 开发环境，按照下面的方式安装：
  *
  * ubuntu: sudo apt-get install libsctp-dev
- * centos 64: sudo yum install lksctp-tools-devel.x86_64
- * centos 32: sudo yum install lksctp-tools-devel.i686
+ * centos: sudo yum install lksctp-tools-devel.x86_64
+ * 或者: sudo yum install lksctp-tools-devel.i686
  */
 
 union val {
@@ -19,7 +19,7 @@ static char *sock_str_flag(union val *, int);
 static char *sock_str_int(union val *, int);
 static char *sock_str_linger(union val *, int);
 static char *sock_str_timeval(union val *, int);
-void printopt(int fd, struct sock_opts* ptr);
+static void printopt(int fd, struct sock_opts* ptr, const char* prompt);
 	
 struct sock_opts {
 	const char *opt_str;
@@ -74,13 +74,13 @@ void showopts(int fd, const char* opt) {
 	for (i = 0; i < size; ++i) {
 		if (opt != NULL) {
 			if (!strcmp(opt, sock_opts[i].opt_str)) {
-				printopt(fd, &sock_opts[i]);
+				printopt(fd, &sock_opts[i], "current value");
 				break;
 			}
 			continue;
 		}
 
-		printopt(fd, &sock_opts[i]);
+		printopt(fd, &sock_opts[i], "current value");
 	}
 
 	if (i == size && opt) {
@@ -111,14 +111,14 @@ void showopts(const char* opt) {
 		}
 		if (opt != NULL) {
 			if (!strcmp(opt, sock_opts[i].opt_str)) {
-				printopt(fd, &sock_opts[i]);
+				printopt(fd, &sock_opts[i], "default");
 				close(fd);
 				break;
 			}
 			close(fd);
 			continue;
 		}
-		printopt(fd, &sock_opts[i]);
+		printopt(fd, &sock_opts[i], "default");
 		close(fd);
 	}
 
@@ -127,7 +127,7 @@ void showopts(const char* opt) {
 	}
 }
 
-void printopt(int fd, struct sock_opts* ptr) {
+static void printopt(int fd, struct sock_opts* ptr, const char* prompt) {
 	int ret;
 	socklen_t len;
 	printf("%s:\t", ptr->opt_str);
@@ -138,7 +138,7 @@ void printopt(int fd, struct sock_opts* ptr) {
 		printf("Operation not supported!\n");
 	}
 	else {
-		printf("default = %s\n", (*ptr->opt_val_str)(&val, len));
+		printf("%s = %s\n", prompt, (*ptr->opt_val_str)(&val, len));
 	}
 }
 
@@ -163,7 +163,7 @@ static char *sock_str_int(union val *ptr, int len) {
 		snprintf(res, sizeof(res), "%ld", ptr->l_val);
 	}
 	else if (len == sizeof(int)){
-		snprintf(res, sizeof(res), "%d", ptr->l_val);
+		snprintf(res, sizeof(res), "%d", (int)(ptr->l_val));
 	}
 	return res;
 }
