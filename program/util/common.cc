@@ -184,9 +184,8 @@ void ignoreSignal(int sig) {
 }
 
 void reuseAddr(int sockfd, int onoff) {
-	int ret, reuse;
-	reuse = (onoff == 0) ? 0 : 1;
-  ret = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+	int ret;
+  ret = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &onoff, sizeof(onoff));
 	if (ret < 0) {
 		ERR_EXIT("reuseAddr");
 	}
@@ -202,5 +201,37 @@ void setLinger(int sockfd, int onoff, int seconds) {
 	ret = setsockopt(sockfd, SOL_SOCKET, SO_LINGER, &lgr, sizeof(lgr));
 	if (ret < 0) {
 		ERR_EXIT("setLinger");
+	}
+}
+
+void setSendBufSize(int sockfd, int size) {
+	int ret;
+	ret = setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
+	if (ret < 0) {
+		ERR_EXIT("setSendBufSize");
+	}
+}
+
+void setRecvBufSize(int sockfd, int size) {
+	int ret;
+	ret = setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size));
+	if (ret < 0) {
+		ERR_EXIT("setRecvBufSize");
+	}
+}
+
+void setMaxSegSize(int sockfd, int size) {
+	int ret;
+	ret = setsockopt(sockfd, IPPROTO_TCP, TCP_MAXSEG, &size, sizeof(size));
+	if (ret < 0) {
+		ERR_EXIT("setMaxSegSize");
+	}
+}
+
+void setNoDelay(int sockfd, int onoff) {
+	int ret;
+	ret = setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &onoff, sizeof(onoff));
+	if (ret < 0) {
+		ERR_EXIT("setMaxSegSize");
 	}
 }

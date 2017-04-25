@@ -19,7 +19,7 @@ static char *sock_str_flag(union val *, int);
 static char *sock_str_int(union val *, int);
 static char *sock_str_linger(union val *, int);
 static char *sock_str_timeval(union val *, int);
-void printopt(struct sock_opts* ptr);
+void printopt(int fd, struct sock_opts* ptr);
 	
 struct sock_opts {
 	const char *opt_str;
@@ -37,7 +37,7 @@ struct sock_opts {
 	{ "SO_RCVBUF", SOL_SOCKET, SO_RCVBUF, sock_str_int },
 	{ "SO_SNDBUF", SOL_SOCKET, SO_SNDBUF, sock_str_int },
 	{ "SO_RCVLOWAT", SOL_SOCKET, SO_RCVLOWAT, sock_str_int },
-	{ "SO_SNDLOWAT", SOL_SOCKET, SO_SNDLOWAT, sock_str_flag },
+	{ "SO_SNDLOWAT", SOL_SOCKET, SO_SNDLOWAT, sock_str_int },
 	{ "SO_RCVTIMEO", SOL_SOCKET, SO_RCVTIMEO, sock_str_timeval},
 	{ "SO_SNDTIMEO", SOL_SOCKET, SO_SNDTIMEO, sock_str_timeval},
 	{ "SO_REUSEADDR", SOL_SOCKET, SO_REUSEADDR, sock_str_flag },
@@ -67,20 +67,59 @@ struct sock_opts {
 	{ "SCTP_NODELAY", IPPROTO_SCTP, SCTP_NODELAY, sock_str_flag },
 };
 
-void showopts(char* opt) {
+void showopts(int fd, const char* opt) {
 	int i;
 	int size = sizeof(sock_opts)/sizeof(struct sock_opts);
 	
 	for (i = 0; i < size; ++i) {
 		if (opt != NULL) {
 			if (!strcmp(opt, sock_opts[i].opt_str)) {
-				printopt(&sock_opts[i]);
+				printopt(fd, &sock_opts[i]);
 				break;
 			}
 			continue;
 		}
 
-		printopt(&sock_opts[i]);
+		printopt(fd, &sock_opts[i]);
+	}
+
+	if (i == size && opt) {
+		printf("no such options: %s\n", opt);
+	}
+}
+void showopts(const char* opt) {
+	int i, fd;
+	int size = sizeof(sock_opts)/sizeof(struct sock_opts);
+	struct sock_opts* ptr;
+	
+	for (i = 0; i < size; ++i) {
+		ptr = &sock_opts[i];
+		switch(ptr->opt_level) {
+			case SOL_SOCKET:
+			case IPPROTO_IP:
+			case IPPROTO_TCP:
+				fd = socket(AF_INET, SOCK_STREAM, 0);
+				break;
+			case IPPROTO_IPV6:
+				fd = socket(AF_INET6, SOCK_STREAM, 0);
+				break;
+			case IPPROTO_SCTP:
+				fd = socket(AF_INET, SOCK_SEQPACKET, IPPROTO_SCTP);
+				break;
+			default:
+				printf("Can't create fd for level %d, opt : %s\n", ptr->opt_level, ptr->opt_str);
+		}
+		if (opt != NULL) {
+			if (!strcmp(opt, sock_opts[i].opt_str)) {
+				printopt(fd, &sock_opts[i]);
+				close(fd);
+				break;
+			}
+			close(fd);
+			continue;
+		}
+		printopt(fd, &sock_opts[i]);
+		close(fd);
 	}
 
 	if (i == size && opt) {
@@ -88,36 +127,19 @@ void showopts(char* opt) {
 	}
 }
 
-void printopt(struct sock_opts* ptr) {
-	int fd, ret;
+void printopt(int fd, struct sock_opts* ptr) {
+	int ret;
 	socklen_t len;
 	printf("%s:\t", ptr->opt_str);
 
-	switch(ptr->opt_level) {
-		case SOL_SOCKET:
-		case IPPROTO_IP:
-		case IPPROTO_TCP:
-			fd = socket(AF_INET, SOCK_STREAM, 0);
-			break;
-		case IPPROTO_IPV6:
-			fd = socket(AF_INET6, SOCK_STREAM, 0);
-			break;
-		case IPPROTO_SCTP:
-			fd = socket(AF_INET, SOCK_SEQPACKET, IPPROTO_SCTP);
-			break;
-		default:
-			printf("Can't create fd for level %d, opt : %s\n", ptr->opt_level, ptr->opt_str);
-	}
 	len = sizeof(val);
 	ret = getsockopt(fd, ptr->opt_level, ptr->opt_name, &val, &len);
 	if (ret < 0) {
-		printf("error on %s\n", ptr->opt_str);
-		ERR_EXIT("getsockopt");
+		printf("Operation not supported!\n");
 	}
 	else {
 		printf("default = %s\n", (*ptr->opt_val_str)(&val, len));
 	}
-	close(fd);
 }
 
 // 标志, on-off 
@@ -137,8 +159,11 @@ static char *sock_str_int(union val *ptr, int len) {
 	if (len != sizeof(int) && len != sizeof(long)) {
 		snprintf(res, sizeof(res), "size (%d) not sizeof(int) or sizeof(long)", len);
 	}
-	else {
+	else if (len == sizeof(long)){
 		snprintf(res, sizeof(res), "%ld", ptr->l_val);
+	}
+	else if (len == sizeof(int)){
+		snprintf(res, sizeof(res), "%d", ptr->l_val);
 	}
 	return res;
 }

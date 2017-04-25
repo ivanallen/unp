@@ -6,6 +6,8 @@ void server_routine();
 void client_routine();
 void setopt(int);
 void handler(int sig);
+void usage(const char* prog_name);
+void help(const char* prog_name);
 
 struct Options {
 	int isServer;
@@ -15,15 +17,22 @@ struct Options {
 	int linger;
 	int slowread;
 	int useclose;
+	int showopts;
+	int sndbufsize;
+	int rcvbufsize;
+  int nodelay;
+  int mss;	
 } g_option;
 
 int main(int argc, char* argv[]) {
 	struct sigaction sa;
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
-		printf("Usage:\n  %s [-s] <-h hostname> [-p port] [--reuse] "
-				"[--linger seconds] [--slowread number (only server)] "
-				"[--useclose]\n", argv[0]);
+		usage(argv[0]);
+		return 1;
+	}
+	if (CONTAINS(args, "help")) {
+		help(argv[0]);
 		return 1;
 	}
 
@@ -39,6 +48,11 @@ int main(int argc, char* argv[]) {
 	SETINT(args, g_option.slowread, "slowread", -1);
 	SETINT(args, g_option.linger, "linger", -1);
 	SETBOOL(args, g_option.useclose, "useclose", 0);
+	SETBOOL(args, g_option.showopts, "showopts", 0);
+	SETINT(args, g_option.sndbufsize, "sendbuf", -1);
+	SETINT(args, g_option.rcvbufsize, "recvbuf", -1);
+	SETBOOL(args, g_option.nodelay, "nodelay", 0);
+	SETINT(args, g_option.mss, "mss", -1);
 
 	if (g_option.isServer) {
 		server_routine();
@@ -241,6 +255,23 @@ void setopt(int sockfd) {
 		printf("set linger: {on %ds}\n", g_option.linger);
 		setLinger(sockfd, 1, g_option.linger);
 	}
+	if (g_option.sndbufsize > 0) {
+		printf("set sndbuf: %d\n", g_option.sndbufsize);
+		setSendBufSize(sockfd, g_option.sndbufsize);
+	}
+	if (g_option.rcvbufsize > 0) {
+		printf("set rcvbuf: %d\n", g_option.rcvbufsize);
+		setRecvBufSize(sockfd, g_option.rcvbufsize);
+	}
+	if (g_option.mss > 0) {
+		printf("set mss: %d\n", g_option.mss);
+		setMaxSegSize(sockfd, g_option.mss);
+	}
+	if (g_option.nodelay) {
+		printf("set set nodelay\n");
+		setNoDelay(sockfd, 1);
+	}
+	if (g_option.showopts) showopts(sockfd, NULL);
 }
 
 void handler(int sig) {
@@ -265,3 +296,33 @@ void handler(int sig) {
 	}
 }
 
+void usage(const char* prog_name) {
+	const char *prompt = 
+    "[--help] [-s] [-h hostname] [-p port]\n"
+    "[--linger seconds] [--slowread size] [--reuse]\n"
+    "[--useclose]\n"
+		"[--sendbuf size] [--recvbuf size]\n"
+		"[--nodelay] [--mss size]\n"
+	  "[--showopts]\n";
+  fprintf(stderr, "usage:\n %s %s\n", prog_name, prompt); 
+}
+
+void help(const char* prog_name) {
+	const char* s = 
+		"\t-s                  以服务器方式启动\n"
+		"\t-h hostname         指定主机名或者 ip 地址\n"
+		"\t-p port             指定端口号\n"
+		"\t--reuse             打开 SO_REUSEADDR\n"
+		"\t--linger seconds    打开 SO_LINGER\n"
+		"\t--slowread size     服务器使用，慢速读取数据，number 指定一次读取的字节数\n"
+	  "\t--useclose          开启开选项，关闭服务器时使用 close 而不是 shutdown\n"
+		"\t--nodelay           关闭 Nagle 算法\n"
+		"\t--sendbuf size      设置发送缓冲区大小\n"
+		"\t--recvbuf size      设置接收缓冲区大小\n"
+		"\t--mss size          设置 MSS 大小\n"
+	  "\t--showopts          打印套接字选项\n";
+
+	usage(prog_name);
+	puts("");
+	printf("%s", s);
+}
