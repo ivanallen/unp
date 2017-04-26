@@ -232,6 +232,14 @@ void setNoDelay(int sockfd, int onoff) {
 	int ret;
 	ret = setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &onoff, sizeof(onoff));
 	if (ret < 0) {
-		ERR_EXIT("setMaxSegSize");
+		ERR_EXIT("setNoDelay");
+	}
+}
+
+void setCork(int sockfd, int onoff) {
+	int ret;
+	ret = setsockopt(sockfd, IPPROTO_TCP, TCP_CORK, &onoff, sizeof(onoff));
+	if (ret < 0) {
+		ERR_EXIT("setCork");
 	}
 }
