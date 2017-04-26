@@ -77,6 +77,7 @@ void doServer(int sockfd) {
 			ERR_EXIT("recvfrom");
 		}
 		puts("...");
+		toUpper(buf, nr);
 	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&cliaddr, len);	
 		if (nr < 0) {
 			if (errno == EINTR) continue;
@@ -86,8 +87,9 @@ void doServer(int sockfd) {
 }
 
 void doClient(int sockfd) {
-	int ret, len, nr, nw;
-	struct sockaddr_in servaddr;
+	int ret, nr, nw;
+	struct sockaddr_in servaddr, replyaddr;
+	socklen_t len;
 	char buf[4096];
 
 	ret = resolve(g_option.hostname, g_option.port, &servaddr);
@@ -105,11 +107,14 @@ void doClient(int sockfd) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("sendto");
 		}
-		nr = recvfrom(sockfd, buf, 4096, 0, NULL, NULL); 
+		len = sizeof(replyaddr);
+		nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&replyaddr, &len); 
 		if (nr < 0) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("recvfrom");
 		}
+		printf("%s:%d reply: ", inet_ntoa(replyaddr.sin_addr), ntohs(replyaddr.sin_port));
+		fflush(stdout);
 		nw = write(STDOUT_FILENO, buf, nr);
 		if (nr < 0) {
 			if (errno == EINTR) continue;
