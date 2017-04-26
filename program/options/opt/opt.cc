@@ -23,6 +23,7 @@ struct Options {
   int nodelay;
   int mss;	
 	int cork;
+	int writesize;
 } g_option;
 
 int main(int argc, char* argv[]) {
@@ -55,6 +56,10 @@ int main(int argc, char* argv[]) {
 	SETBOOL(args, g_option.nodelay, "nodelay", 0);
 	SETBOOL(args, g_option.cork, "cork", 0);
 	SETINT(args, g_option.mss, "mss", -1);
+	SETINT(args, g_option.writesize, "writesize", -1);
+
+	if (g_option.slowread > 4096) g_option.slowread = 4096;
+	if (g_option.writesize > 4096) g_option.writesize = 4096;
 
 	if (g_option.isServer) {
 		server_routine();
@@ -205,7 +210,7 @@ void doClient(int sockfd) {
 
 		if (FD_ISSET(STDIN_FILENO, &fds)) {
 			// fgets 带有缓冲区，与 select 一起使用太危险，换成 iread，就是对 read 包装了一下。
-			nr = iread(STDIN_FILENO, buf, 4096);
+			nr = iread(STDIN_FILENO, buf, g_option.writesize);
 			if (nr > 0) {
 				nw = writen(sockfd, buf, nr);
 				if (nw < nr) {
@@ -307,7 +312,7 @@ void usage(const char* prog_name) {
 	const char *prompt = 
     "[--help] [-s] [-h hostname] [-p port]\n"
     "[--linger seconds] [--slowread size] [--reuse]\n"
-    "[--useclose]\n"
+    "[--useclose] [--writesize]\n"
 		"[--sendbuf size] [--recvbuf size]\n"
 		"[--nodelay] [--cork] [--mss size]\n"
 	  "[--showopts]\n";
@@ -328,6 +333,7 @@ void help(const char* prog_name) {
 		"\t--sendbuf size      设置发送缓冲区大小\n"
 		"\t--recvbuf size      设置接收缓冲区大小\n"
 		"\t--mss size          设置 MSS 大小\n"
+		"\t--writesize size    设置客户端一次 write 多少字节\n"
 	  "\t--showopts          打印套接字选项\n";
 
 	usage(prog_name);
