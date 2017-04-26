@@ -145,6 +145,7 @@ void doServer(int sockfd) {
 		if (g_option.slowread > 0) {
 			nr = iread(sockfd, buf, g_option.slowread);
 			if (nr < 0) {
+				printf("%d bytes received\n", total);
 				ERR_EXIT("iread");
 			}
 			if (nr == 0) {
@@ -314,7 +315,7 @@ void help(const char* prog_name) {
 		"\t-p port             指定端口号\n"
 		"\t--reuse             打开 SO_REUSEADDR\n"
 		"\t--linger seconds    打开 SO_LINGER\n"
-		"\t--slowread size     服务器使用，慢速读取数据，number 指定一次读取的字节数\n"
+		"\t--slowread size     服务器使用，慢速读取数据，size 指定一次读取的字节数\n"
 	  "\t--useclose          开启开选项，关闭服务器时使用 close 而不是 shutdown\n"
 		"\t--nodelay           关闭 Nagle 算法\n"
 		"\t--sendbuf size      设置发送缓冲区大小\n"
