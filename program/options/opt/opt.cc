@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
 	SETBOOL(args, g_option.nodelay, "nodelay", 0);
 	SETBOOL(args, g_option.cork, "cork", 0);
 	SETINT(args, g_option.mss, "mss", -1);
-	SETINT(args, g_option.writesize, "writesize", -1);
+	SETINT(args, g_option.writesize, "writesize", 4096);
 
 	if (g_option.slowread > 4096) g_option.slowread = 4096;
 	if (g_option.writesize > 4096) g_option.writesize = 4096;
