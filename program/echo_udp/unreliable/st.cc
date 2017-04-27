@@ -13,18 +13,26 @@ struct Options {
 	int writesize;
 	int recvbuf;
 	int showopts;
+	int wait;
 } g_option;
 
 static int total = 0;
 
 void handler(int sig);
 void setopts(int sockfd);
+void usage(const char* progname);
+void help();
 
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
-		printf("Usage:\n  %s [-s] [-h hostname] [-p port] "
-				"[--count number] [--writesize size] [--recvbuf size] [--showopts]\n", argv[0]);
+		usage(argv[0]);
+		return 1;
+	}
+
+	if (CONTAINS(args, "help")) {
+		usage(argv[0]);
+		help();
 		return 1;
 	}
 
@@ -35,6 +43,7 @@ int main(int argc, char* argv[]) {
 	SETINT(args, g_option.count, "count", 2000);
 	SETINT(args, g_option.writesize, "writesize", 1400);
 	SETINT(args, g_option.recvbuf, "recvbuf", -1);
+	SETINT(args, g_option.wait, "wait", -1);
 	SETBOOL(args, g_option.showopts, "showopts", 0);
 
 
@@ -96,6 +105,7 @@ void doServer(int sockfd) {
 
 	total = 0;
   while(1) {
+		if (g_option.wait > 0) usleep(g_option.wait);
 		len = sizeof(cliaddr);
 		nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&cliaddr, &len); 
 		if (nr < 0) {
@@ -134,7 +144,25 @@ void handler(int sig) {
 
 void setopts(int sockfd) {
 	if (g_option.recvbuf > 0) {
-		puts("set recvbuf");
+		printf("set recvbuf: %d\n", g_option.recvbuf);
 		setRecvBufSize(sockfd, g_option.recvbuf);
 	}
+}
+
+void usage(const char* progname) {
+	printf("Usage:\n  %s [--help] [-s] [-h hostname] [-p port] "
+			"[--count number] [--writesize size] [--recvbuf size] "
+			"[--wait time] [--showopts]\n", progname);
+}
+
+void help() {
+	printf(
+			"\t-s                  以服务器方式启动，按 CTRL C 统计接收报文数\n"
+			"\t-h                  指定主机名或 ip 地址，默认为通用地址\n"
+			"\t-p                  指定端口号，默认为 8000\n"
+			"\t--count             客户端发包次数\n"
+			"\t--writesize         发送的 udp 数据报大小，不超过 4096\n"
+			"\t--recvbuf           设置接收缓冲区大小，默认使用系统指定大小\n"
+			"\t--wait              服务器接收完一个数据包后等待多少微秒，默认不等待\n"
+			"\t--showopts          打印套接字选项\n");
 }
