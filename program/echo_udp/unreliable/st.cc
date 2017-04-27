@@ -11,16 +11,20 @@ struct Options {
 	int port;
 	int count;
 	int writesize;
+	int recvbuf;
+	int showopts;
 } g_option;
 
 static int total = 0;
 
 void handler(int sig);
+void setopts(int sockfd);
 
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
-		printf("Usage:\n  %s [-s] [-h hostname] [-p port] [--count number] [--writesize size]\n", argv[0]);
+		printf("Usage:\n  %s [-s] [-h hostname] [-p port] "
+				"[--count number] [--writesize size] [--recvbuf size] [--showopts]\n", argv[0]);
 		return 1;
 	}
 
@@ -30,6 +34,9 @@ int main(int argc, char* argv[]) {
 	SETINT(args, g_option.port, "p", 8000);
 	SETINT(args, g_option.count, "count", 2000);
 	SETINT(args, g_option.writesize, "writesize", 1400);
+	SETINT(args, g_option.recvbuf, "recvbuf", -1);
+	SETBOOL(args, g_option.showopts, "showopts", 0);
+
 
 	if (g_option.count < 0) g_option.count = 1;
 	if (g_option.writesize < 0) g_option.writesize = 1;
@@ -57,6 +64,8 @@ void server_routine() {
 
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sockfd < 0) ERR_EXIT("socket");
+	setopts(sockfd);
+	if (g_option.showopts) showopts(sockfd, NULL);
 
 	ret = bind(sockfd, (struct sockaddr*)&servaddr, sizeof servaddr);
 	if (ret < 0) ERR_EXIT("bind");
@@ -71,6 +80,8 @@ void client_routine() {
 
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sockfd < 0) ERR_EXIT("socket");
+	setopts(sockfd);
+	if (g_option.showopts) showopts(sockfd, NULL);
 
 	doClient(sockfd);
 
@@ -118,5 +129,12 @@ void handler(int sig) {
 	if (sig == SIGINT) {
 		printf("received %d datagrams\n", total);
 		total = 0;
+	}
+}
+
+void setopts(int sockfd) {
+	if (g_option.recvbuf > 0) {
+		puts("set recvbuf");
+		setRecvBufSize(sockfd, g_option.recvbuf);
 	}
 }
