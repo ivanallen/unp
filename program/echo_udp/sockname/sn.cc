@@ -12,8 +12,8 @@ struct Options {
 
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
-	if (args.empty()){
-		printf("Usage:\n  %s [-h hostname] [-p port]\n", argv[0]);
+	if (CONTAINS(args, "help")){
+		printf("Usage:\n  %s [--help] [-h hostname] [-p port]\n", argv[0]);
 		return 1;
 	}
 

@@ -164,14 +164,17 @@ void toUpper(char* str, int n) {
 }
 
 
-void registSignal(int sig, void (*handler)(int)) {
-	struct sigaction sa;
+void registSignal(int sig, void (*handler)(int), void(**oldhandler)(int)) {
+	struct sigaction sa, old;
 	sa.sa_handler = handler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
-	if (sigaction(sig, &sa, NULL) < 0) {
+	if (sigaction(sig, &sa, &old) < 0) {
 		ERR_EXIT("sigaction");
 	}
+
+	if (oldhandler)
+		*oldhandler = old.sa_handler;
 }
 
 void ignoreSignal(int sig) {
@@ -241,5 +244,27 @@ void setCork(int sockfd, int onoff) {
 	ret = setsockopt(sockfd, IPPROTO_TCP, TCP_CORK, &onoff, sizeof(onoff));
 	if (ret < 0) {
 		ERR_EXIT("setCork");
+	}
+}
+void setRecvTimeout(int sockfd, int nsec) {
+	int ret;
+	struct timeval tv;
+	tv.tv_sec = nsec;
+	tv.tv_usec = 0;
+
+	ret = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+	if (ret < 0) {
+		ERR_EXIT("setRecvTimeout");
+	}
+}
+void setSendTimeout(int sockfd, int nsec) {
+	int ret;
+	struct timeval tv;
+	tv.tv_sec = nsec;
+	tv.tv_usec = 0;
+
+	ret = setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+	if (ret < 0) {
+		ERR_EXIT("setRecvTimeout");
 	}
 }
