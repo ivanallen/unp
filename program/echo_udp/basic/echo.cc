@@ -79,9 +79,9 @@ void doServer(int sockfd) {
 		puts("...");
 		toUpper(buf, nr);
 	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&cliaddr, len);	
-		if (nr < 0) {
+		if (nw < 0) {
 			if (errno == EINTR) continue;
-			ERR_EXIT("recvfrom");
+			ERR_EXIT("sendto");
 		}
 	}
 }
@@ -96,14 +96,13 @@ void doClient(int sockfd) {
 	if (ret < 0) ERR_EXIT("resolve");
 
   while(1) {
-		nr = read(STDIN_FILENO, buf, 4096);
+		nr = iread(STDIN_FILENO, buf, 4096);
 		if (nr < 0) {
-			if (errno == EINTR) continue;
-			ERR_EXIT("recvfrom");
+			ERR_EXIT("iread");
 		}
 		else if (nr == 0) break;
 	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&servaddr, sizeof(servaddr));	
-		if (nr < 0) {
+		if (nw < 0) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("sendto");
 		}
@@ -115,10 +114,9 @@ void doClient(int sockfd) {
 		}
 		printf("%s:%d reply: ", inet_ntoa(replyaddr.sin_addr), ntohs(replyaddr.sin_port));
 		fflush(stdout);
-		nw = write(STDOUT_FILENO, buf, nr);
-		if (nr < 0) {
-			if (errno == EINTR) continue;
-			ERR_EXIT("sendto");
+		nw = iwrite(STDOUT_FILENO, buf, nr);
+		if (nw < 0) {
+			ERR_EXIT("write");
 		}
 	}
 }

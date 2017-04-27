@@ -53,10 +53,17 @@ void server_routine() {
 }
 
 void client_routine() {
-	int sockfd;
+	int sockfd, ret;
+	struct sockaddr_in servaddr;
 
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sockfd < 0) ERR_EXIT("socket");
+
+	ret = resolve(g_option.hostname, g_option.port, &servaddr);
+	if (ret < 0) ERR_EXIT("resolve");
+
+	ret = connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
+	if (ret < 0) ERR_EXIT("connect");
 
 	doClient(sockfd);
 
@@ -78,9 +85,9 @@ void doServer(int sockfd) {
 		}
 		puts("...");
 	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&cliaddr, len);	
-		if (nw < 0) {
+		if (nr < 0) {
 			if (errno == EINTR) continue;
-			ERR_EXIT("sentdo");
+			ERR_EXIT("recvfrom");
 		}
 	}
 }
@@ -90,8 +97,6 @@ void doClient(int sockfd) {
 	struct sockaddr_in servaddr;
 	char buf[4096];
 
-	ret = resolve(g_option.hostname, g_option.port, &servaddr);
-	if (ret < 0) ERR_EXIT("resolve");
 
   while(1) {
 		nr = iread(STDIN_FILENO, buf, 4096);
@@ -99,18 +104,16 @@ void doClient(int sockfd) {
 			ERR_EXIT("iread");
 		}
 		else if (nr == 0) break;
-	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&servaddr, sizeof(servaddr));	
+	  nw = iwrite(sockfd, buf, nr);
 		if (nw < 0) {
-			if (errno == EINTR) continue;
-			ERR_EXIT("sendto");
+			ERR_EXIT("iwrite");
 		}
-		nr = recvfrom(sockfd, buf, 4096, 0, NULL, NULL); 
+		nr = iread(sockfd, buf, 4096);
 		if (nr < 0) {
-			if (errno == EINTR) continue;
-			ERR_EXIT("recvfrom");
+			ERR_EXIT("iread");
 		}
 		nw = iwrite(STDOUT_FILENO, buf, nr);
-		if (nr < 0) {
+		if (nw < 0) {
 			ERR_EXIT("iwrite");
 		}
 	}

@@ -11,6 +11,8 @@ struct Options {
 	int port;
 } g_option;
 
+int verify(struct sockaddr_in *a, int len1, struct sockaddr_in *b, int len2);
+
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
@@ -77,42 +79,61 @@ void doServer(int sockfd) {
 			ERR_EXIT("recvfrom");
 		}
 		puts("...");
+		toUpper(buf, nr);
 	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&cliaddr, len);	
-		if (nw < 0) {
+		if (nr < 0) {
 			if (errno == EINTR) continue;
-			ERR_EXIT("sentdo");
+			ERR_EXIT("recvfrom");
 		}
 	}
 }
 
 void doClient(int sockfd) {
-	int ret, len, nr, nw;
-	struct sockaddr_in servaddr;
+	int ret, nr, nw;
+	struct sockaddr_in servaddr, replyaddr;
+	socklen_t len;
 	char buf[4096];
 
 	ret = resolve(g_option.hostname, g_option.port, &servaddr);
 	if (ret < 0) ERR_EXIT("resolve");
 
   while(1) {
-		nr = iread(STDIN_FILENO, buf, 4096);
-		if (nr < 0) {
-			ERR_EXIT("iread");
-		}
-		else if (nr == 0) break;
-	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&servaddr, sizeof(servaddr));	
-		if (nw < 0) {
-			if (errno == EINTR) continue;
-			ERR_EXIT("sendto");
-		}
-		nr = recvfrom(sockfd, buf, 4096, 0, NULL, NULL); 
+		nr = read(STDIN_FILENO, buf, 4096);
 		if (nr < 0) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("recvfrom");
 		}
-		nw = iwrite(STDOUT_FILENO, buf, nr);
+		else if (nr == 0) break;
+	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&servaddr, sizeof(servaddr));	
 		if (nr < 0) {
-			ERR_EXIT("iwrite");
+			if (errno == EINTR) continue;
+			ERR_EXIT("sendto");
+		}
+		len = sizeof(replyaddr);
+		nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&replyaddr, &len); 
+		if (nr < 0) {
+			if (errno == EINTR) continue;
+			ERR_EXIT("recvfrom");
+		}
+
+		if (!verify(&servaddr, sizeof(servaddr), &replyaddr, len)) {
+			printf("%s:%d reply: (ignored)\n", inet_ntoa(replyaddr.sin_addr), ntohs(replyaddr.sin_port));
+			continue;
+		}
+
+		printf("%s:%d reply: ", inet_ntoa(replyaddr.sin_addr), ntohs(replyaddr.sin_port));
+		fflush(stdout);
+		nw = write(STDOUT_FILENO, buf, nr);
+		if (nr < 0) {
+			if (errno == EINTR) continue;
+			ERR_EXIT("sendto");
 		}
 	}
 }
 
+int verify(struct sockaddr_in *a, int len1, struct sockaddr_in *b, int len2) {
+	if (len1 != len2 || memcmp(a, b, len1) != 0) {
+		return 0;
+	}
+	return 1;
+}
