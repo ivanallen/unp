@@ -84,6 +84,7 @@ void doServer(int sockfd) {
 			ERR_EXIT("recvfrom");
 		}
 		puts("...");
+		toUpper(buf, nr);
 	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&cliaddr, len);	
 		if (nr < 0) {
 			if (errno == EINTR) continue;
