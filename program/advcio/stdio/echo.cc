@@ -9,6 +9,7 @@ struct Options {
 	int isServer;
 	char hostname[32];
 	int port;
+	int flush;
 } g_option;
 
 void handler(int sig) {
@@ -33,7 +34,7 @@ int main(int argc, char* argv[]) {
 	struct sigaction sa;
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
-		printf("Usage:\n  %s [-s] <-h hostname> [-p port]\n", argv[0]);
+		printf("Usage:\n  %s [-s] <-h hostname> [-p port] [--flush]\n", argv[0]);
 		return 1;
 	}
 
@@ -44,6 +45,7 @@ int main(int argc, char* argv[]) {
 	SETBOOL(args, g_option.isServer, "s", 0);
 	SETSTR(args, g_option.hostname, "h", "0");
 	SETINT(args, g_option.port, "p", 8000);
+	SETBOOL(args, g_option.flush, "flush", 0);
 
 	if (g_option.isServer) {
 		server_routine();
@@ -122,7 +124,7 @@ void client_routine() {
 }
 
 void doServer(int sockfd) {
-	int nr, nw;
+	int ret;
 	char buf[4096];
 	FILE *fpin, *fpout;
 	fpin = fdopen(sockfd, "r");
@@ -130,8 +132,12 @@ void doServer(int sockfd) {
 
 	while(fgets(buf, 4096, fpin) != NULL) {
 		toUpper(buf, strlen(buf));
-		fputs(buf, fpout);
+		ret = fputs(buf, fpout);
+		if (ret == EOF) {
+			puts("fputs error");
+		}
 	}
+	if (g_option.flush) fflush(fpout);
 }
 
 void doClient(int sockfd) {
