@@ -142,9 +142,8 @@ int recvfrom_timeo(int sockfd, void *buf, size_t len, int flags, struct sockaddr
 		exit(1);
 	}
 	ret = recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
-	if (ret < 0) {
-		if (errno == EINTR) errno = ETIMEDOUT;
-		else ERR_EXIT("recvfrom_timeo: recvfrom");
+	if (ret < 0 && errno == EINTR) {
+		errno = ETIMEDOUT;
 	}
 	alarm(0);
   registSignal(SIGALRM, oldfun);

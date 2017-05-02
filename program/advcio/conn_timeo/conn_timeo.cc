@@ -94,9 +94,8 @@ int connect_timeo(int sockfd, const struct sockaddr *addr, socklen_t addrlen, in
 	}
 
 	ret = connect(sockfd, addr, addrlen);
-	if (ret < 0) {
-		if (errno = EINTR) errno = ETIMEDOUT;
-		else ERR_EXIT("connect_timeo: connect");
+	if (ret < 0 && errno == EINTR) {
+		errno = ETIMEDOUT;
 	}
 
 	alarm(0);

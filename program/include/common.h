@@ -1,4 +1,6 @@
 #include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +23,7 @@
 #include <poll.h>
 #include <limits.h>
 #include <netinet/tcp.h>
+#include <sys/uio.h>
 
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)

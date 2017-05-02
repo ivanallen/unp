@@ -147,8 +147,6 @@ int readable_timeo(int fd, int nsec) {
 
 int recvfrom_timeo(int sockfd, void *buf, size_t len, int flags, struct sockaddr *src_addr, socklen_t *addrlen, int nsec) {
 	int ret;
-  void (*oldfun)(int);
-
 
 	ret = readable_timeo(sockfd, nsec);
 
