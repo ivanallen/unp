@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	
+
 	registSignal(SIGCHLD, handler);
 	registSignal(SIGPIPE, handler);
 
@@ -95,7 +95,7 @@ void server_routine() {
 			exit(0);
 		}
 		else if (pid < 0) {
-		  perror("fork");	
+		  perror("fork");
 			close(sockfd);
 			break;
 		}
@@ -106,14 +106,22 @@ void server_routine() {
 
 void client_routine() {
 	int ret, sockfd;
-	struct sockaddr_un servaddr;
+	struct sockaddr_un servaddr, cliaddr;
 
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sun_family = AF_LOCAL;
 	strncpy(servaddr.sun_path, g_option.path, sizeof(servaddr.sun_path));
 
+	bzero(&cliaddr, sizeof(cliaddr));
+	cliaddr.sun_family = AF_LOCAL;
+	strncpy(cliaddr.sun_path, tmpnam(NULL), sizeof(cliaddr.sun_path));
+
 	sockfd = socket(AF_LOCAL, SOCK_STREAM, 0);
 	if (sockfd < 0) ERR_EXIT("socket");
+
+    ret = bind(sockfd, (struct sockaddr*)&cliaddr, sizeof cliaddr);
+	if (ret < 0) ERR_EXIT("bind");
+
 
 	ret = connect(sockfd, (struct sockaddr*)&servaddr, sizeof servaddr);
 	if (ret < 0) ERR_EXIT("connect");
