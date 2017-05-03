@@ -24,6 +24,7 @@
 #include <limits.h>
 #include <netinet/tcp.h>
 #include <sys/uio.h>
+#include <sys/un.h>
 
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
