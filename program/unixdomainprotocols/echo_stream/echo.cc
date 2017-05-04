@@ -59,25 +59,25 @@ void server_routine() {
 	int ret, listenfd, sockfd;
 	pid_t pid;
 	struct sockaddr_un servaddr, cliaddr;
-	socklen_t cliaddrlen;
+	socklen_t len;
 
 	if (!g_option.abstract)
 		unlink(g_option.path);
 
-	resolve(g_option.path, &servaddr, g_option.abstract);
+	resolve(g_option.path, &servaddr, &len, g_option.abstract);
 
 	listenfd = socket(AF_LOCAL, SOCK_STREAM, 0);
 	if (listenfd < 0) ERR_EXIT("socket");
 
-	ret = bind(listenfd, (struct sockaddr*)&servaddr, sizeof servaddr);
+	ret = bind(listenfd, (struct sockaddr*)&servaddr, len);
 	if (ret < 0) ERR_EXIT("bind");
 
 	ret = listen(listenfd, 5);
 	if (ret < 0) ERR_EXIT("listen");
 
 	while(1) {
-		cliaddrlen = sizeof(cliaddr);
-		sockfd = accept(listenfd, (struct sockaddr*)&cliaddr, &cliaddrlen);
+		len = sizeof(cliaddr);
+		sockfd = accept(listenfd, (struct sockaddr*)&cliaddr, &len);
 		if (sockfd < 0) {
 			if (errno == ECONNABORTED || errno == EINTR) {
 				perror("accept");
@@ -108,8 +108,9 @@ void server_routine() {
 void client_routine() {
 	int ret, sockfd;
 	struct sockaddr_un servaddr, cliaddr;
+	socklen_t len;
 
-	resolve(g_option.path, &servaddr, g_option.abstract);
+	resolve(g_option.path, &servaddr, &len, g_option.abstract);
 	//resolve(tmpnam(NULL), &cliaddr);
 
 	sockfd = socket(AF_LOCAL, SOCK_STREAM, 0);
@@ -119,7 +120,7 @@ void client_routine() {
 	//if (ret < 0) ERR_EXIT("bind");
 
 
-	ret = connect(sockfd, (struct sockaddr*)&servaddr, sizeof servaddr);
+	ret = connect(sockfd, (struct sockaddr*)&servaddr, len);
 	if (ret < 0) ERR_EXIT("connect");
 
 	doClient(sockfd);

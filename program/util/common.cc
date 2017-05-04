@@ -30,12 +30,20 @@ int resolve(const char* hostname, int port, struct sockaddr_in *addr) {
 	return 0;
 }
 
-int resolve(const char* pathname, struct sockaddr_un *addr, int abstract) {
+int resolve(const char* pathname, struct sockaddr_un *addr, socklen_t *len, int abstract) {
 	bzero(addr, sizeof(struct sockaddr_un));
 	addr->sun_family = AF_LOCAL;
-	strncpy(addr->sun_path, pathname, sizeof(addr->sun_path) - 1);
-	if (abstract)
+	if (abstract) {
+		strncpy(addr->sun_path + 1, pathname, sizeof(addr->sun_path) - 2);
+		addr->sun_path[0] = '@';
+		*len = SUN_LEN(addr);
+		// abstract socket address
 		addr->sun_path[0] = 0;
+	}
+	else {
+		strncpy(addr->sun_path, pathname, sizeof(addr->sun_path) - 1);
+		*len = sizeof(struct sockaddr_un);
+	}
 	return 0;
 }
 

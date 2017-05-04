@@ -66,7 +66,7 @@ typedef std::map<std::string, std::string> Args;
 
 int64_t now();
 int resolve(const char* hostname, int port, struct sockaddr_in *addr);
-int resolve(const char* pathname, struct sockaddr_un *addr, int abstract = 0);
+int resolve(const char* pathname, struct sockaddr_un *addr, socklen_t *len, int abstract = 0);
 int readn(int fd, char* buf, int n);
 int readline(int fd, char* buf, int n);
 int writen(int fd, const char* buf, int n);
