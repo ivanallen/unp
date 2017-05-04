@@ -7,6 +7,7 @@ void client_routine();
 
 struct Options {
 	int isServer;
+	int abstract;
 	char path[PATH_MAX];
 } g_option;
 
@@ -32,7 +33,7 @@ int main(int argc, char* argv[]) {
 	struct sigaction sa;
 	Args args = parsecmdline(argc, argv);
 	if (CONTAINS(args, "help")){
-		printf("Usage:\n  %s [-s] [--path pathname]\n", argv[0]);
+		printf("Usage:\n  %s [-s] [--path pathname] [--abstract]\n", argv[0]);
 		return 1;
 	}
 
@@ -41,7 +42,8 @@ int main(int argc, char* argv[]) {
 	registSignal(SIGPIPE, handler);
 
 	SETBOOL(args, g_option.isServer, "s", 0);
-	SETSTR(args, g_option.path, "h", "./dog");
+	SETBOOL(args, g_option.abstract, "abstract", 0);
+	SETSTR(args, g_option.path, "path", "");
 
 	if (g_option.isServer) {
 		server_routine();
@@ -59,11 +61,10 @@ void server_routine() {
 	struct sockaddr_un servaddr, cliaddr;
 	socklen_t cliaddrlen;
 
-	unlink(g_option.path);
+	if (!g_option.abstract)
+		unlink(g_option.path);
 
-	bzero(&servaddr, sizeof(servaddr));
-	servaddr.sun_family = AF_LOCAL;
-	strncpy(servaddr.sun_path, g_option.path, sizeof(servaddr.sun_path));
+	resolve(g_option.path, &servaddr, g_option.abstract);
 
 	listenfd = socket(AF_LOCAL, SOCK_STREAM, 0);
 	if (listenfd < 0) ERR_EXIT("socket");
@@ -108,19 +109,14 @@ void client_routine() {
 	int ret, sockfd;
 	struct sockaddr_un servaddr, cliaddr;
 
-	bzero(&servaddr, sizeof(servaddr));
-	servaddr.sun_family = AF_LOCAL;
-	strncpy(servaddr.sun_path, g_option.path, sizeof(servaddr.sun_path));
-
-	bzero(&cliaddr, sizeof(cliaddr));
-	cliaddr.sun_family = AF_LOCAL;
-	strncpy(cliaddr.sun_path, tmpnam(NULL), sizeof(cliaddr.sun_path));
+	resolve(g_option.path, &servaddr, g_option.abstract);
+	//resolve(tmpnam(NULL), &cliaddr);
 
 	sockfd = socket(AF_LOCAL, SOCK_STREAM, 0);
 	if (sockfd < 0) ERR_EXIT("socket");
 
-    ret = bind(sockfd, (struct sockaddr*)&cliaddr, sizeof cliaddr);
-	if (ret < 0) ERR_EXIT("bind");
+	//ret = bind(sockfd, (struct sockaddr*)&cliaddr, sizeof cliaddr);
+	//if (ret < 0) ERR_EXIT("bind");
 
 
 	ret = connect(sockfd, (struct sockaddr*)&servaddr, sizeof servaddr);

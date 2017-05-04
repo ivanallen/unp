@@ -30,6 +30,15 @@ int resolve(const char* hostname, int port, struct sockaddr_in *addr) {
 	return 0;
 }
 
+int resolve(const char* pathname, struct sockaddr_un *addr, int abstract) {
+	bzero(addr, sizeof(struct sockaddr_un));
+	addr->sun_family = AF_LOCAL;
+	strncpy(addr->sun_path, pathname, sizeof(addr->sun_path) - 1);
+	if (abstract)
+		addr->sun_path[0] = 0;
+	return 0;
+}
+
 int readn(int fd, char* buf, int n) {
 	int len, nread;
 
@@ -267,4 +276,116 @@ void setSendTimeout(int sockfd, int nsec) {
 	if (ret < 0) {
 		ERR_EXIT("setRecvTimeout");
 	}
+}
+
+char* itoa(int n) {
+	static char buf[16];
+	snprintf(buf, 16, "%d", n);
+	return buf;
+}
+
+int readfd(int fd, char* buf, int size, int *recvfd) {
+	int nr;
+	struct msghdr msg;
+	struct iovec iov[1];
+	struct cmsghdr *cmptr;
+
+	union {
+		struct cmsghdr cm;
+		char control[CMSG_SPACE(sizeof(int))];
+	} control_un;
+
+	msg.msg_control = control_un.control;
+	msg.msg_controllen = sizeof(control_un.control);
+	msg.msg_name = NULL;
+	msg.msg_namelen = 0;
+	iov[0].iov_base = buf;
+	iov[0].iov_len = size;
+	msg.msg_iov = iov;
+	msg.msg_iovlen = 1;
+
+	nr = recvmsg(fd, &msg, 0);
+	if (nr <= 0) return nr;
+
+	if ((cmptr = CMSG_FIRSTHDR(&msg)) != NULL
+			&& cmptr->cmsg_len == CMSG_LEN(sizeof(int))) {
+		if (cmptr->cmsg_level != SOL_SOCKET) {
+			ERR_QUIT("readfd: control level != SOL_SOCKET");
+		}
+		if (cmptr->cmsg_type != SCM_RIGHTS) {
+			ERR_QUIT("readfd: control type != SCM_RIGHTS");
+		}
+		*recvfd = *((int*)CMSG_DATA(cmptr));
+	}
+	else {
+		*recvfd = -1;
+	}
+	return nr;
+}
+
+int writefd(int fd, char* buf, int size, int sendfd) {
+	int nw;
+	struct msghdr msg;
+	struct iovec iov[1];
+	struct cmsghdr *cmptr;
+
+	union {
+		struct cmsghdr cm;
+		char control[CMSG_SPACE(sizeof(int))];
+	} control_un;
+
+	msg.msg_control = control_un.control;
+	msg.msg_controllen = sizeof(control_un.control);
+
+	cmptr = CMSG_FIRSTHDR(&msg);
+	cmptr->cmsg_len = CMSG_LEN(sizeof(int));
+	cmptr->cmsg_level = SOL_SOCKET;
+	cmptr->cmsg_type = SCM_RIGHTS;
+	*((int*)CMSG_DATA(cmptr)) = sendfd;
+
+	msg.msg_name = NULL;
+	msg.msg_namelen = 0;
+	iov[0].iov_base = buf;
+	iov[0].iov_len = size;
+	msg.msg_iov = iov;
+	msg.msg_iovlen = 1;
+
+	nw = sendmsg(fd, &msg, 0);
+	return nw;
+}
+
+int myOpen(const char* pathname, int mode) {
+  pid_t pid;
+	int fd, ret, status, sockfd[2];
+	char c;
+	
+	ret = socketpair(AF_LOCAL, SOCK_STREAM, 0, sockfd);
+	if (ret < 0) ERR_EXIT("myOpen:socketpair");
+
+	pid = fork();
+	if (pid < 0) ERR_EXIT("myOpen:fork");
+	if (pid == 0) {
+		// child
+		close(sockfd[0]);
+		execlp("./openfile", "./openfile", itoa(sockfd[1]), pathname, itoa(mode), NULL);
+		ERR_EXIT("myOpen:execlp");
+	}
+
+	ret = waitpid(pid, &status, 0);
+	if (ret < 0) ERR_EXIT("myOpen:waitpid");
+	if (WIFEXITED(status) == 0) ERR_QUIT("myOpen:child terminated abnormally!\n");
+
+	status = WEXITSTATUS(status);
+	if (status == 0) {
+		readfd(sockfd[0], &c, 1, &fd);
+#ifdef DEBUG
+		printf("myOpen: c = %c\n", c);
+#endif
+	}
+	else {
+		errno = status;
+		fd = -1;
+	}
+	close(sockfd[0]);
+	return fd;
 }
