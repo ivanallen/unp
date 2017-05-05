@@ -7,7 +7,7 @@ void client_routine();
 
 struct Options {
 	int isServer;
-    char path[PATH_MAX];
+	char path[PATH_MAX];
 } g_option;
 
 int main(int argc, char* argv[]) {
@@ -28,23 +28,21 @@ int main(int argc, char* argv[]) {
 		client_routine();
 	}
 
-  return 0;
+	return 0;
 }
 
 void server_routine() {
 	int ret, sockfd;
 	struct sockaddr_un servaddr, cliaddr;
-	socklen_t cliaddrlen;
+	socklen_t len;
 
-    bzero(&servaddr, sizeof(servaddr));
-    servaddr.sun_family = AF_LOCAL;
-    strncpy(servaddr.sun_path, g_option.path, sizeof(servaddr.sun_path));
+	resolve(g_option.path, &servaddr, &len);
 
 	sockfd = socket(AF_LOCAL, SOCK_DGRAM, 0);
 	if (sockfd < 0) ERR_EXIT("socket");
 
-    unlink(g_option.path);
-	ret = bind(sockfd, (struct sockaddr*)&servaddr, sizeof servaddr);
+	unlink(g_option.path);
+	ret = bind(sockfd, (struct sockaddr*)&servaddr, len);
 	if (ret < 0) ERR_EXIT("bind");
 
 	doServer(sockfd);
@@ -54,17 +52,16 @@ void server_routine() {
 
 void client_routine() {
 	int sockfd, ret;
-    struct sockaddr_un cliaddr;
+	struct sockaddr_un cliaddr;
+	socklen_t len;
 
-    bzero(&cliaddr, sizeof(cliaddr));
-    cliaddr.sun_family = AF_LOCAL;
-    strncpy(cliaddr.sun_path, tmpnam(NULL), sizeof(cliaddr.sun_path));
+	resolve(tmpnam(NULL), &cliaddr, &len);
 
 	sockfd = socket(AF_LOCAL, SOCK_DGRAM, 0);
 	if (sockfd < 0) ERR_EXIT("socket");
 
-	ret = bind(sockfd, (struct sockaddr*)&cliaddr, sizeof cliaddr);
-    if (ret < 0) ERR_EXIT("client_routine: bind");
+	ret = bind(sockfd, (struct sockaddr*)&cliaddr, len);
+	if (ret < 0) ERR_EXIT("client_routine: bind");
 
 	doClient(sockfd);
 
@@ -77,7 +74,7 @@ void doServer(int sockfd) {
 	struct sockaddr_un cliaddr;
 	socklen_t len;
 
-  while(1) {
+	while(1) {
 		len = sizeof(cliaddr);
 		nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&cliaddr, &len);
 		if (nr < 0) {
@@ -85,8 +82,8 @@ void doServer(int sockfd) {
 			ERR_EXIT("recvfrom");
 		}
 		toUpper(buf, nr);
-        printf("%s come in\n", cliaddr.sun_path);
-        nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&cliaddr, len);
+		printf("%s come in\n", cliaddr.sun_path);
+		nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&cliaddr, len);
 		if (nw < 0) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("sendto");
@@ -100,17 +97,15 @@ void doClient(int sockfd) {
 	socklen_t len;
 	char buf[4096];
 
-    bzero(&servaddr, sizeof(servaddr));
-    servaddr.sun_family = AF_LOCAL;
-    strncpy(servaddr.sun_path, g_option.path, sizeof(servaddr.sun_path));
+	resolve(g_option.path, &servaddr, &len);
 
-    while(1) {
+	while(1) {
 		nr = iread(STDIN_FILENO, buf, 4096);
 		if (nr < 0) {
 			ERR_EXIT("iread");
 		}
 		else if (nr == 0) break;
-	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&servaddr, sizeof(servaddr));
+		nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&servaddr, sizeof(servaddr));
 		if (nw < 0) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("sendto");
