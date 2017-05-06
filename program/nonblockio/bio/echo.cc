@@ -85,8 +85,9 @@ void client_routine() {
 }
 
 void doServer(int sockfd) {
-	int nr, nw;
+	int nr, nw, total;
 	char buf[4096];
+	total = 0;
 
 	while(1) {
     nr = iread(sockfd, buf, 4096);
@@ -97,6 +98,9 @@ void doServer(int sockfd) {
 		}
 
 		toUpper(buf, nr);
+		total += nr;
+		DBG_PRINT("received %d bytes\n", total);
+		DBG_PRINT("\x1b[1A");
 
 		nw = writen(sockfd, buf, nr);
 		if (nw < 0) ERR_EXIT("writen");
