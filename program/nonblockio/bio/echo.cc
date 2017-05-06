@@ -99,8 +99,9 @@ void doServer(int sockfd) {
 
 		toUpper(buf, nr);
 		total += nr;
-		DBG_PRINT("received %d bytes\n", total);
-		DBG_PRINT("\x1b[1A");
+		DBG_PRINT("received %d bytes totally\n", total);
+		DBG_PRINT("ready to send %d bytes\n", nr);
+		DBG_PRINT("\x1b[2A");
 
 		nw = writen(sockfd, buf, nr);
 		if (nw < 0) ERR_EXIT("writen");
@@ -141,8 +142,11 @@ void doClient(int sockfd) {
 				FD_CLR(STDIN_FILENO, &fds);
 			}
 			else {
+				DBG_PRINT("ready to send %d bytes...\n", nr);
 				nw = writen(sockfd, buf, nr);
 				if (nw < 0) ERR_EXIT("writen to sockfd");
+				DBG_PRINT("send %d bytes actually!\n", nw);
+				DBG_PRINT("\x1b[2A");
 			}
 		}
 
