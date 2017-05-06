@@ -28,7 +28,7 @@
 #include <arpa/inet.h>
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
-#define ERR_QUIT(msg) do { fputs(msg, stderr); exit(1); } while(0)
+#define ERR_QUIT(format,...) do { fprintf(stderr, format, ##__VA_ARGS__); exit(1); } while(0)
 
 #define CONTAINS(container,element) (container.find(element) != container.end())
 #define SETINT(args,val,opt,def) \
@@ -87,6 +87,9 @@ void setNoDelay(int sockfd, int onoff);
 void setCork(int sockfd, int onoff);
 void setRecvTimeout(int sockfd, int nsec);
 void setSendTimeout(int sockfd, int nsec);
+void setPassCred(int sockfd, int onoff);
 int readfd(int fd, char* buf, int size, int *recvfd);
 int writefd(int fd, char* buf, int size, int sendfd);
 int myOpen(const char* pathname, int mode);
+int recvCred(int sockfd, char *buf, int size, struct ucred *cred);
+int sendCred(int sockfd, char *buf, int size);

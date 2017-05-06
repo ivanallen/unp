@@ -286,6 +286,14 @@ void setSendTimeout(int sockfd, int nsec) {
 	}
 }
 
+void setPassCred(int sockfd, int onoff) {
+	int ret;
+	ret = setsockopt(sockfd, SOL_SOCKET, SO_PASSCRED, &onoff, sizeof(onoff));
+	if (ret < 0) {
+		ERR_EXIT("setPassCred");
+	}
+}
+
 char* itoa(int n) {
 	static char buf[16];
 	snprintf(buf, 16, "%d", n);
@@ -396,4 +404,73 @@ int myOpen(const char* pathname, int mode) {
 	}
 	close(sockfd[0]);
 	return fd;
+}
+
+int recvCred(int sockfd, char *buf, int size, struct ucred *cred) {
+	int nr;
+  struct msghdr msg;
+	struct iovec iov[1];
+	char control[CMSG_SPACE(sizeof(struct ucred))]; 
+	struct cmsghdr *cmptr = (struct cmsghdr*)control;
+
+	cmptr->cmsg_len = CMSG_LEN(sizeof(struct ucred));
+	cmptr->cmsg_level = SOL_SOCKET;
+	cmptr->cmsg_type = SCM_CREDENTIALS;
+
+	msg.msg_name = NULL;
+	msg.msg_namelen = 0;
+	iov[0].iov_base = buf;
+	iov[0].iov_len = size;
+	msg.msg_iov = iov;
+	msg.msg_iovlen = 1;
+	msg.msg_control = control;
+	msg.msg_controllen = CMSG_SPACE(sizeof(struct ucred));
+	msg.msg_flags = 0;
+
+  nr = recvmsg(sockfd, &msg, 0);
+	if (nr < 0) return nr;
+
+	if (cred && (cmptr = CMSG_FIRSTHDR(&msg))) {
+    if (cmptr->cmsg_len != CMSG_LEN(sizeof(struct ucred))) {
+			ERR_QUIT("control length = %d", cmptr->cmsg_len);
+		}
+		if (cmptr->cmsg_level != SOL_SOCKET) {
+			ERR_QUIT("control level != SOL_SOCKET");
+		}
+		if (cmptr->cmsg_type != SCM_CREDENTIALS) {
+			ERR_QUIT("control type != SCM_CREDENTIALS");
+		}
+		memcpy(cred, CMSG_DATA(cmptr), sizeof(struct ucred));
+	}
+	return nr;
+}
+
+int sendCred(int sockfd, char *buf, int size) {
+	int nw;
+  struct msghdr msg;
+	struct iovec iov[1];
+	char control[CMSG_SPACE(sizeof(struct ucred))]; 
+	struct cmsghdr *cmptr = (struct cmsghdr*)control;
+	struct ucred *cred = (struct ucred*)CMSG_DATA(cmptr);
+
+	cmptr->cmsg_len = CMSG_LEN(sizeof(struct ucred));
+	cmptr->cmsg_level = SOL_SOCKET;
+	cmptr->cmsg_type = SCM_CREDENTIALS;
+	cred->pid = getpid();
+	cred->uid = getuid();
+	cred->gid = getgid();
+
+	msg.msg_name = NULL;
+	msg.msg_namelen = 0;
+	iov[0].iov_base = buf;
+	iov[0].iov_len = size;
+	msg.msg_iov = iov;
+	msg.msg_iovlen = 1;
+	msg.msg_control = control;
+	msg.msg_controllen = CMSG_SPACE(sizeof(struct ucred));
+	msg.msg_flags = 0;
+
+  nw = sendmsg(sockfd, &msg, 0);
+
+	return nw;
 }
