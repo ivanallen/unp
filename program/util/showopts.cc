@@ -19,7 +19,7 @@ static char *sock_str_flag(union val *, int);
 static char *sock_str_int(union val *, int);
 static char *sock_str_linger(union val *, int);
 static char *sock_str_timeval(union val *, int);
-static void printopt(int fd, struct sock_opts* ptr, const char* prompt);
+static void printopt(int fd, struct sock_opts* ptr, const char* prompt, FILE*);
 	
 struct sock_opts {
 	const char *opt_str;
@@ -67,27 +67,27 @@ struct sock_opts {
 	{ "SCTP_NODELAY", IPPROTO_SCTP, SCTP_NODELAY, sock_str_flag },
 };
 
-void showopts(int fd, const char* opt) {
+void showopts(int fd, const char* opt, FILE* fp) {
 	int i;
 	int size = sizeof(sock_opts)/sizeof(struct sock_opts);
 	
 	for (i = 0; i < size; ++i) {
 		if (opt != NULL) {
 			if (!strcmp(opt, sock_opts[i].opt_str)) {
-				printopt(fd, &sock_opts[i], "current value");
+				printopt(fd, &sock_opts[i], "current value", fp);
 				break;
 			}
 			continue;
 		}
 
-		printopt(fd, &sock_opts[i], "current value");
+		printopt(fd, &sock_opts[i], "current value", fp);
 	}
 
 	if (i == size && opt) {
-		printf("no such options: %s\n", opt);
+		DBG_PRINT("no such options: %s\n", opt);
 	}
 }
-void showopts(const char* opt) {
+void showopts(const char* opt, FILE* fp) {
 	int i, fd;
 	int size = sizeof(sock_opts)/sizeof(struct sock_opts);
 	struct sock_opts* ptr;
@@ -111,34 +111,34 @@ void showopts(const char* opt) {
 		}
 		if (opt != NULL) {
 			if (!strcmp(opt, sock_opts[i].opt_str)) {
-				printopt(fd, &sock_opts[i], "default");
+				printopt(fd, &sock_opts[i], "default", fp);
 				close(fd);
 				break;
 			}
 			close(fd);
 			continue;
 		}
-		printopt(fd, &sock_opts[i], "default");
+		printopt(fd, &sock_opts[i], "default", fp);
 		close(fd);
 	}
 
 	if (i == size && opt) {
-		printf("no such options: %s\n", opt);
+		DBG_PRINT("no such options: %s\n", opt);
 	}
 }
 
-static void printopt(int fd, struct sock_opts* ptr, const char* prompt) {
+static void printopt(int fd, struct sock_opts* ptr, const char* prompt, FILE* fp) {
 	int ret;
 	socklen_t len;
-	printf("%s:\t", ptr->opt_str);
+	fprintf(fp, "%s:\t", ptr->opt_str);
 
 	len = sizeof(val);
 	ret = getsockopt(fd, ptr->opt_level, ptr->opt_name, &val, &len);
 	if (ret < 0) {
-		printf("Operation not supported!\n");
+		DBG_PRINT("Operation not supported!\n");
 	}
 	else {
-		printf("%s = %s\n", prompt, (*ptr->opt_val_str)(&val, len));
+		fprintf(fp, "%s = %s\n", prompt, (*ptr->opt_val_str)(&val, len));
 	}
 }
 

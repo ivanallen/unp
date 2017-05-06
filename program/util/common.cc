@@ -72,12 +72,6 @@ int writen(int fd, const char* buf, int n) {
 			if (errno == EINTR) continue;
 			return -1;
 		}
-		else if (len == 0) {
-			// short write
-			puts("write return 0");
-			break;
-		}
-
 		nwrite += len;
 	}
 	return nwrite;
@@ -411,11 +405,14 @@ int recvCred(int sockfd, char *buf, int size, struct ucred *cred) {
   struct msghdr msg;
 	struct iovec iov[1];
 	char control[CMSG_SPACE(sizeof(struct ucred))]; 
-	struct cmsghdr *cmptr = (struct cmsghdr*)control;
+	struct cmsghdr *cmptr;
 
+	/* 
+	cmptr = (struct cmsghdr*)control;
 	cmptr->cmsg_len = CMSG_LEN(sizeof(struct ucred));
 	cmptr->cmsg_level = SOL_SOCKET;
 	cmptr->cmsg_type = SCM_CREDENTIALS;
+	*/
 
 	msg.msg_name = NULL;
 	msg.msg_namelen = 0;

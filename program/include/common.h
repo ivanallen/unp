@@ -14,6 +14,7 @@
 #include <limits.h>
 #include <netinet/tcp.h>
 #include <signal.h>
+#include <assert.h>
 #include <sys/epoll.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -29,6 +30,7 @@
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
 #define ERR_QUIT(format,...) do { fprintf(stderr, format, ##__VA_ARGS__); exit(1); } while(0)
+#define DBG_PRINT(format,...) do { fprintf(stderr, format, ##__VA_ARGS__); } while(0)
 
 #define CONTAINS(container,element) (container.find(element) != container.end())
 #define SETINT(args,val,opt,def) \
@@ -76,8 +78,8 @@ std::map<std::string, std::string> parsecmdline(int argc, char* argv[]);
 void toUpper(char* str, int n);
 void registSignal(int sig, void (*handler)(int), void(**oldhandler)(int) = NULL);
 void ignoreSignal(int sig);
-void showopts(int fd, const char* opt);
-void showopts(const char* opt);
+void showopts(int fd, const char* opt, FILE* fp = stdout);
+void showopts(const char* opt, FILE* fp = stdout);
 void reuseAddr(int sockfd, int onoff); 
 void setLinger(int sockfd, int onoff, int seconds);
 void setSendBufSize(int sockfd, int size);
