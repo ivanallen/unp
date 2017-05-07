@@ -101,7 +101,7 @@ void doServer(int sockfd) {
     nr = iread(sockfd, buf, 4096);
 		if (nr < 0) ERR_EXIT("iread");
 		else if (nr == 0) {
-			LOG("\x1b[3B]");
+			LOG("\x1b[3B");
 			DBG_PRINT("client closed\n");
 			break;
 		}
@@ -116,7 +116,7 @@ void doServer(int sockfd) {
 		LOG("\x1b[3A");
 		i = (i + 1) % 3;
 		if (nw < 0) {
-			LOG("\x1b[3B]");
+			LOG("\x1b[3B");
 			ERR_EXIT("writen");
 		}
 	}
