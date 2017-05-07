@@ -44,14 +44,14 @@ while(0)
 
 // red info
 #define DBG_PRINT(format,...) do { \
-	fprintf(stderr, "\x1b[K\x1b[?25l\x1b[31m"); \
+	fprintf(stderr, "\x1b[K\x1b[31m"); \
 	fprintf(stderr, format, ##__VA_ARGS__);\
 	fprintf(stderr, "\x1b[0m");\
 } while(0)
 
 // green info
 #define LOG(format,...) do { \
-	fprintf(stderr, "\x1b[K\x1b[?25l\x1b[32m"); \
+	fprintf(stderr, "\x1b[K\x1b\x1b[32m"); \
 	fprintf(stderr, format, ##__VA_ARGS__);\
 	fprintf(stderr, "\x1b[0m");\
 } while(0)

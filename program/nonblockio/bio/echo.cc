@@ -30,13 +30,14 @@ int main(int argc, char* argv[]) {
 
 	registSignal(SIGINT, handler);
 
+	LOG("\x1b[?25l");
 	if (g_option.isServer) {
 		server_routine();
 	}
 	else {
 		client_routine();
 	}
-
+	LOG("\x1b[?25h");
   return 0;
 }
 
