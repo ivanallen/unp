@@ -191,6 +191,7 @@ void doClient(int sockfd) {
 			}
 		}
 	}
+	free(buf);
 }
 
 void handler(int sig) {

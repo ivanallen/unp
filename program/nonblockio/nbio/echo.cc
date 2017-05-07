@@ -87,6 +87,7 @@ void client_routine() {
 	if (ret < 0) ERR_EXIT("connect");
 
 	// 在 connect 之后再设置非阻塞
+	// 设置非阻塞，消除被阻塞的风险
 	setNonblock(sockfd, 1);
 	doClient(sockfd);
 
@@ -161,7 +162,7 @@ void doClient(int sockfd) {
 		// 发送缓冲区有空闲，监听标准输入
 		if (cliclosed == 0 && toend < to + length) 
 			FD_SET(STDIN_FILENO, &rfds);
-		// 接收缓冲区有空闲，监听 sockfd
+		// 接收缓冲区有空闲，监听 sockfd. 如果服务器都关了，就没必要去监听了。
 		if (servclosed == 0 && fromend < from + length)
 			FD_SET(sockfd, &rfds);
 		// 有尚未发送的数据，监听 sockfd 可写事件
@@ -200,6 +201,8 @@ void doClient(int sockfd) {
 				// 更新 toend
 				toend += nr;
 				// 通知发送缓冲区有数据可发送
+				// 实际上你也可以不写这一句，这无疑增加了 select 的负担，
+				// 在明知道 select 一定会将 sockfd 置入 wfds 的情况下，为什么不自己动手呢？
 				FD_SET(sockfd, &wfds);
 			}
 		}
@@ -225,6 +228,8 @@ void doClient(int sockfd) {
 				servclosed = 1;
 
 				// 接收缓冲区数据已经处理完毕，有可能未处理完毕（假定写入到 stdout 无限慢）
+				// 在程序启动时指定 --slow 参数，就会发现，下面这个 if 根本不会执行
+				// 因为 --slow 选项会减慢客户端处理接收缓冲区的速度
 				if (fromstart == fromend) {
 					LOG("1:finished!\n");
 					break;
