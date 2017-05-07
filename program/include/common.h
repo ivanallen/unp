@@ -28,7 +28,12 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
+#define ERR_EXIT(msg) do { \
+	fprintf(stderr, "\x1b[K\x1b[31m"); \
+	perror(msg); \
+	fprintf(stderr, "\x1b[0m");\
+	exit(1); \
+} while(0)
 
 #define ERR_QUIT(format,...) do { \
 	fprintf(stderr, "\x1b[K\x1b[31m"); \
