@@ -1,0 +1,36 @@
+#define PRINT(COLOR, format,...) do { \
+	fprintf(stderr, "\x1b[K"); \
+	fprintf(stderr, COLOR); \
+	fprintf(stderr, format, ##__VA_ARGS__);\
+	fprintf(stderr, "\x1b[0m");\
+} while(0)
+
+#define ERR_EXIT(msg) do { \
+	fprintf(stderr, "\x1b[K\x1b[31m"); \
+	perror(msg); \
+	fprintf(stderr, "\x1b[0m");\
+	exit(1); \
+} while(0)
+
+#define ERR_QUIT(format,...) do { \
+	fprintf(stderr, "\x1b[K\x1b[31m"); \
+	fprintf(stderr, format, ##__VA_ARGS__); \
+	fprintf(stderr, "\x1b[0m");\
+	exit(1); } \
+while(0)
+
+#define LOG_RED "\x1b[31m"
+#define LOG_GREEN "\x1b[32m"
+#define LOG_YELLOW "\x1b[33m"
+
+// red info
+#define ERR_PRINT(format,...) PRINT(LOG_RED, format, ##__VA_ARGS__) 
+
+// green info
+#define LOG(format,...) PRINT(LOG_GREEN, format, ##__VA_ARGS__)
+
+// yellow info
+#define WARNING(format,...) PRINT(LOG_YELLOW, format, ##__VA_ARGS__)
+
+
+

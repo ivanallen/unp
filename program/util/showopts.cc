@@ -84,7 +84,7 @@ void showopts(int fd, const char* opt, FILE* fp) {
 	}
 
 	if (i == size && opt) {
-		DBG_PRINT("no such options: %s\n", opt);
+		LOG("no such options: %s\n", opt);
 	}
 }
 void showopts(const char* opt, FILE* fp) {
@@ -123,7 +123,7 @@ void showopts(const char* opt, FILE* fp) {
 	}
 
 	if (i == size && opt) {
-		DBG_PRINT("no such options: %s\n", opt);
+		LOG("no such options: %s\n", opt);
 	}
 }
 
@@ -135,7 +135,7 @@ static void printopt(int fd, struct sock_opts* ptr, const char* prompt, FILE* fp
 	len = sizeof(val);
 	ret = getsockopt(fd, ptr->opt_level, ptr->opt_name, &val, &len);
 	if (ret < 0) {
-		DBG_PRINT("Operation not supported!\n");
+		LOG("Operation not supported!\n");
 	}
 	else {
 		fprintf(fp, "%s = %s\n", prompt, (*ptr->opt_val_str)(&val, len));

@@ -65,7 +65,7 @@ void server_routine() {
 	sockfd = accept(listenfd, (struct sockaddr*)&cliaddr, &len);
 	if (sockfd < 0) ERR_EXIT("accept");
 
-	DBG_PRINT("%s:%d come in\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+	WARNING("%s:%d come in\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 
 	doServer(sockfd);
 	close(sockfd);
@@ -103,7 +103,7 @@ void doServer(int sockfd) {
 		if (nr < 0) ERR_EXIT("iread");
 		else if (nr == 0) {
 			LOG("\x1b[3B");
-			DBG_PRINT("client closed\n");
+			ERR_PRINT("client closed\n");
 			break;
 		}
 
@@ -160,12 +160,12 @@ void doClient(int sockfd) {
 				FD_CLR(STDIN_FILENO, &fds);
 			}
 			else {
-				LOG("send %d bytes totally%s\n", totalsend, dots[i]);
 				LOG("ready to send %d bytes%s\n", nr, dots[i]);
 				nw = writen(sockfd, buf, nr);
 				if (nw < 0) ERR_EXIT("writen to sockfd");
 				totalsend += nw;
 				LOG("send %d bytes actually%s\n", nw, dots[i]);
+				LOG("send %d bytes totally%s\n", totalsend, dots[i]);
 				LOG("\x1b[3A");
 				i = (i + 1) % 3;
 			}
@@ -178,10 +178,10 @@ void doClient(int sockfd) {
 				// server no data to send.
 				LOG("\x1b[3B");
 				if (cliclose) {
-					DBG_PRINT("server closed!\n");
+					ERR_PRINT("server closed!\n");
 				}
 				else {
-					DBG_PRINT("server exception!\n");
+					ERR_PRINT("server exception!\n");
 				}
 				break;
 			}
@@ -195,7 +195,7 @@ void doClient(int sockfd) {
 
 void handler(int sig) {
 	if (sig == SIGINT) {
-		DBG_PRINT("exited!\n");
+		ERR_PRINT("exited!\n");
 		fprintf(stderr, "\x1b[0m\x1b[?25h");
 		exit(0);
 	}
