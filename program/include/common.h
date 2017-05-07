@@ -30,7 +30,11 @@
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
 #define ERR_QUIT(format,...) do { fprintf(stderr, format, ##__VA_ARGS__); exit(1); } while(0)
-#define DBG_PRINT(format,...) do { fprintf(stderr, format, ##__VA_ARGS__); } while(0)
+#define DBG_PRINT(format,...) do { \
+	fprintf(stderr, "\x1b[K\x1b[31m"); \
+	fprintf(stderr, format, ##__VA_ARGS__);\
+	fprintf(stderr, "\x1b[0m");\
+} while(0)
 
 #define CONTAINS(container,element) (container.find(element) != container.end())
 #define SETINT(args,val,opt,def) \

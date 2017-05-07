@@ -87,39 +87,43 @@ void client_routine() {
 }
 
 void doServer(int sockfd) {
-	int nr, nw, total, i;
+	int nr, nw, total, totalsend, i;
 	char buf[4096];
 
 	i = 0;
 	total = 0;
+	totalsend = 0;
 
 	while(1) {
     nr = iread(sockfd, buf, 4096);
 		if (nr < 0) ERR_EXIT("iread");
 		else if (nr == 0) {
-			DBG_PRINT("\x1b[2B]");
+			DBG_PRINT("\x1b[3B]");
 			DBG_PRINT("client closed\n");
 			break;
 		}
 
 		toUpper(buf, nr);
 		total += nr;
-		DBG_PRINT("\x1b[K\x1b[32mreceived %d bytes totally%s\n\x1b[0m", total, dots[i]);
-		DBG_PRINT("\x1b[K\x1b[32mready to send %d bytes%s\n\x1b[0m", nr, dots[i]);
-		DBG_PRINT("\x1b[2A");
-		i = (i + 1) % 3;
-
+		DBG_PRINT("received %d bytes totally%s\n", total, dots[i]);
+		DBG_PRINT("ready to send %d bytes%s\n", nr, dots[i]);
 		nw = writen(sockfd, buf, nr);
+		totalsend += nw;
+		DBG_PRINT("send %d bytes totally%s\n", totalsend, dots[i]);
+		DBG_PRINT("\x1b[3A");
+		i = (i + 1) % 3;
 		if (nw < 0) ERR_EXIT("writen");
 	}
 }
 
 void doClient(int sockfd) {
-	int nr, nw, i, maxfd, ret, cliclose;
+	int nr, nw, i, maxfd, ret, cliclose, totalsend, actualsend;
   char *buf;
 	fd_set rfds, fds;
 
 	i = 0;
+	totalsend = 0;
+	actualsend = 0;
 	cliclose = 0;
 	// 客户端一次发送 Length 字节
 	buf = (char*)malloc(g_option.length);
@@ -149,11 +153,13 @@ void doClient(int sockfd) {
 				FD_CLR(STDIN_FILENO, &fds);
 			}
 			else {
-				DBG_PRINT("\x1b[K\x1b[31mready to send %d bytes%s\n\x1b[0m", nr, dots[i]);
+				DBG_PRINT("send %d bytes totally%s\n", totalsend, dots[i]);
+				DBG_PRINT("ready to send %d bytes%s\n", nr, dots[i]);
 				nw = writen(sockfd, buf, nr);
 				if (nw < 0) ERR_EXIT("writen to sockfd");
-				DBG_PRINT("\x1b[K\x1b[31msend %d bytes actually%s\n\x1b[0m", nw, dots[i]);
-				DBG_PRINT("\x1b[2A");
+				totalsend += nw;
+				DBG_PRINT("send %d bytes actually%s\n", nw, dots[i]);
+				DBG_PRINT("\x1b[3A");
 				i = (i + 1) % 3;
 			}
 		}
@@ -163,7 +169,7 @@ void doClient(int sockfd) {
 			if (nr < 0) ERR_EXIT("iread from sockfd");
 			else if (nr == 0) {
 				// server no data to send.
-				DBG_PRINT("\x1b[2B");
+				DBG_PRINT("\x1b[3B");
 				if (cliclose) {
 					DBG_PRINT("server closed!\n");
 				}
