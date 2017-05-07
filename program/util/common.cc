@@ -288,6 +288,22 @@ void setPassCred(int sockfd, int onoff) {
 	}
 }
 
+void setNonblock(int fd, int onoff) {
+	int flags, ret;
+	flags = fcntl(fd, F_GETFL);
+	if (flags < 0) ERR_EXIT("setNonblock:F_GETFL");
+
+	if (onoff) {
+		flags |= O_NONBLOCK;
+	}
+	else {
+		flags &= ~O_NONBLOCK;
+	}
+
+	ret = fcntl(fd, F_SETFL, flags);
+	if (ret < 0) ERR_EXIT("setNonblock:F_SETFL");
+}
+
 char* itoa(int n) {
 	static char buf[16];
 	snprintf(buf, 16, "%d", n);

@@ -87,6 +87,7 @@ void setCork(int sockfd, int onoff);
 void setRecvTimeout(int sockfd, int nsec);
 void setSendTimeout(int sockfd, int nsec);
 void setPassCred(int sockfd, int onoff);
+void setNonblock(int fd, int onoff);
 int readfd(int fd, char* buf, int size, int *recvfd);
 int writefd(int fd, char* buf, int size, int sendfd);
 int myOpen(const char* pathname, int mode);
