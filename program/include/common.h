@@ -29,9 +29,24 @@
 #include <arpa/inet.h>
 
 #define ERR_EXIT(msg) do { perror(msg); exit(1); } while(0)
-#define ERR_QUIT(format,...) do { fprintf(stderr, format, ##__VA_ARGS__); exit(1); } while(0)
-#define DBG_PRINT(format,...) do { \
+
+#define ERR_QUIT(format,...) do { \
 	fprintf(stderr, "\x1b[K\x1b[31m"); \
+	fprintf(stderr, format, ##__VA_ARGS__); \
+	fprintf(stderr, "\x1b[0m");\
+	exit(1); } \
+while(0)
+
+// red info
+#define DBG_PRINT(format,...) do { \
+	fprintf(stderr, "\x1b[K\x1b[?25l\x1b[31m"); \
+	fprintf(stderr, format, ##__VA_ARGS__);\
+	fprintf(stderr, "\x1b[0m");\
+} while(0)
+
+// green info
+#define LOG(format,...) do { \
+	fprintf(stderr, "\x1b[K\x1b[?25l\x1b[32m"); \
 	fprintf(stderr, format, ##__VA_ARGS__);\
 	fprintf(stderr, "\x1b[0m");\
 } while(0)

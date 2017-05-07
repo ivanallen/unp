@@ -4,6 +4,7 @@ void doServer(int);
 void doClient(int);
 void server_routine();
 void client_routine();
+void handler(int);
 
 const char *dots[3] = {".", "..", "..."};
 
@@ -26,6 +27,8 @@ int main(int argc, char* argv[]) {
 	SETSTR(args, g_option.hostname, "h", "0");
 	SETINT(args, g_option.port, "p", 8000);
 	SETINT(args, g_option.length, "l", 4096);
+
+	registSignal(SIGINT, handler);
 
 	if (g_option.isServer) {
 		server_routine();
@@ -105,12 +108,12 @@ void doServer(int sockfd) {
 
 		toUpper(buf, nr);
 		total += nr;
-		DBG_PRINT("received %d bytes totally%s\n", total, dots[i]);
-		DBG_PRINT("ready to send %d bytes%s\n", nr, dots[i]);
+		LOG("received %d bytes totally%s\n", total, dots[i]);
+		LOG("ready to send %d bytes%s\n", nr, dots[i]);
 		nw = writen(sockfd, buf, nr);
 		totalsend += nw;
-		DBG_PRINT("send %d bytes totally%s\n", totalsend, dots[i]);
-		DBG_PRINT("\x1b[3A");
+		LOG("send %d bytes totally%s\n", totalsend, dots[i]);
+		LOG("\x1b[3A");
 		i = (i + 1) % 3;
 		if (nw < 0) ERR_EXIT("writen");
 	}
@@ -153,13 +156,13 @@ void doClient(int sockfd) {
 				FD_CLR(STDIN_FILENO, &fds);
 			}
 			else {
-				DBG_PRINT("send %d bytes totally%s\n", totalsend, dots[i]);
-				DBG_PRINT("ready to send %d bytes%s\n", nr, dots[i]);
+				LOG("send %d bytes totally%s\n", totalsend, dots[i]);
+				LOG("ready to send %d bytes%s\n", nr, dots[i]);
 				nw = writen(sockfd, buf, nr);
 				if (nw < 0) ERR_EXIT("writen to sockfd");
 				totalsend += nw;
-				DBG_PRINT("send %d bytes actually%s\n", nw, dots[i]);
-				DBG_PRINT("\x1b[3A");
+				LOG("send %d bytes actually%s\n", nw, dots[i]);
+				LOG("\x1b[3A");
 				i = (i + 1) % 3;
 			}
 		}
@@ -169,7 +172,7 @@ void doClient(int sockfd) {
 			if (nr < 0) ERR_EXIT("iread from sockfd");
 			else if (nr == 0) {
 				// server no data to send.
-				DBG_PRINT("\x1b[3B");
+				LOG("\x1b[3B");
 				if (cliclose) {
 					DBG_PRINT("server closed!\n");
 				}
@@ -183,5 +186,13 @@ void doClient(int sockfd) {
 				if (nw < 0) ERR_EXIT("writen to stdout");
 			}
 		}
+	}
+}
+
+void handler(int sig) {
+	if (sig == SIGINT) {
+		DBG_PRINT("exited!\n");
+		fprintf(stderr, "\x1b[0m\x1b[?25h");
+		exit(0);
 	}
 }
