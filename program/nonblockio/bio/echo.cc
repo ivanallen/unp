@@ -5,6 +5,8 @@ void doClient(int);
 void server_routine();
 void client_routine();
 
+const char *dots[3] = {".", "..", "..."};
+
 struct Options {
 	int isServer;
 	char hostname[32];
@@ -85,23 +87,27 @@ void client_routine() {
 }
 
 void doServer(int sockfd) {
-	int nr, nw, total;
+	int nr, nw, total, i;
 	char buf[4096];
+
+	i = 0;
 	total = 0;
 
 	while(1) {
     nr = iread(sockfd, buf, 4096);
 		if (nr < 0) ERR_EXIT("iread");
 		else if (nr == 0) {
+			DBG_PRINT("\x1b[2B]");
 			DBG_PRINT("client closed\n");
 			break;
 		}
 
 		toUpper(buf, nr);
 		total += nr;
-		DBG_PRINT("received %d bytes totally\n", total);
-		DBG_PRINT("ready to send %d bytes\n", nr);
+		DBG_PRINT("received %d bytes totally%s\n", total, dots[i]);
+		DBG_PRINT("ready to send %d bytes%s\n", nr, dots[i]);
 		DBG_PRINT("\x1b[2A");
+		i = (i + 1) % 3;
 
 		nw = writen(sockfd, buf, nr);
 		if (nw < 0) ERR_EXIT("writen");
@@ -109,10 +115,11 @@ void doServer(int sockfd) {
 }
 
 void doClient(int sockfd) {
-	int nr, nw, maxfd, ret, cliclose;
+	int nr, nw, i, maxfd, ret, cliclose;
   char *buf;
 	fd_set rfds, fds;
 
+	i = 0;
 	cliclose = 0;
 	// 客户端一次发送 Length 字节
 	buf = (char*)malloc(g_option.length);
@@ -142,11 +149,12 @@ void doClient(int sockfd) {
 				FD_CLR(STDIN_FILENO, &fds);
 			}
 			else {
-				DBG_PRINT("ready to send %d bytes...\n", nr);
+				DBG_PRINT("ready to send %d bytes%s\n", nr, dots[i]);
 				nw = writen(sockfd, buf, nr);
 				if (nw < 0) ERR_EXIT("writen to sockfd");
-				DBG_PRINT("send %d bytes actually!\n", nw);
+				DBG_PRINT("send %d bytes actually%s\n", nw, dots[i]);
 				DBG_PRINT("\x1b[2A");
+				i = (i + 1) % 3;
 			}
 		}
 
@@ -155,6 +163,7 @@ void doClient(int sockfd) {
 			if (nr < 0) ERR_EXIT("iread from sockfd");
 			else if (nr == 0) {
 				// server no data to send.
+				DBG_PRINT("\x1b[2B");
 				if (cliclose) {
 					DBG_PRINT("server closed!\n");
 				}
