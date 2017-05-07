@@ -104,8 +104,8 @@ void doServer(int sockfd) {
 
 		toUpper(buf, nr);
 		total += nr;
-		DBG_PRINT("received %d bytes totally%s\n", total, dots[i]);
-		DBG_PRINT("ready to send %d bytes%s\n", nr, dots[i]);
+		DBG_PRINT("\x1b[K\x1b[32mreceived %d bytes totally%s\n\x1b[0m", total, dots[i]);
+		DBG_PRINT("\x1b[K\x1b[32mready to send %d bytes%s\n\x1b[0m", nr, dots[i]);
 		DBG_PRINT("\x1b[2A");
 		i = (i + 1) % 3;
 
@@ -149,10 +149,10 @@ void doClient(int sockfd) {
 				FD_CLR(STDIN_FILENO, &fds);
 			}
 			else {
-				DBG_PRINT("ready to send %d bytes%s\n", nr, dots[i]);
+				DBG_PRINT("\x1b[K\x1b[31mready to send %d bytes%s\n\x1b[0m", nr, dots[i]);
 				nw = writen(sockfd, buf, nr);
 				if (nw < 0) ERR_EXIT("writen to sockfd");
-				DBG_PRINT("send %d bytes actually%s\n", nw, dots[i]);
+				DBG_PRINT("\x1b[K\x1b[31msend %d bytes actually%s\n\x1b[0m", nw, dots[i]);
 				DBG_PRINT("\x1b[2A");
 				i = (i + 1) % 3;
 			}
