@@ -30,14 +30,14 @@ int main(int argc, char* argv[]) {
 
 	registSignal(SIGINT, handler);
 
-	LOG("\x1b[?25l");
+	CURSOR_OFF();
 	if (g_option.isServer) {
 		server_routine();
 	}
 	else {
 		client_routine();
 	}
-	LOG("\x1b[?25h");
+	CURSOR_ON();
   return 0;
 }
 
@@ -102,7 +102,7 @@ void doServer(int sockfd) {
     nr = iread(sockfd, buf, 4096);
 		if (nr < 0) ERR_EXIT("iread");
 		else if (nr == 0) {
-			LOG("\x1b[3B");
+			CURSOR_DOWN(3);
 			ERR_PRINT("client closed\n");
 			break;
 		}
@@ -114,10 +114,10 @@ void doServer(int sockfd) {
 		nw = writen(sockfd, buf, nr);
 		totalsend += nw;
 		LOG("send %d bytes totally%s\n", totalsend, dots[i]);
-		LOG("\x1b[3A");
+		CURSOR_UP(3);
 		i = (i + 1) % 3;
 		if (nw < 0) {
-			LOG("\x1b[3B");
+			CURSOR_DOWN(3);
 			ERR_EXIT("writen");
 		}
 	}
@@ -166,7 +166,7 @@ void doClient(int sockfd) {
 				totalsend += nw;
 				LOG("send %d bytes actually%s\n", nw, dots[i]);
 				LOG("send %d bytes totally%s\n", totalsend, dots[i]);
-				LOG("\x1b[3A");
+				CURSOR_UP(3);
 				i = (i + 1) % 3;
 			}
 		}
@@ -176,7 +176,7 @@ void doClient(int sockfd) {
 			if (nr < 0) ERR_EXIT("iread from sockfd");
 			else if (nr == 0) {
 				// server no data to send.
-				LOG("\x1b[3B");
+				CURSOR_DOWN(3);
 				if (cliclose) {
 					ERR_PRINT("server closed!\n");
 				}
@@ -197,7 +197,8 @@ void doClient(int sockfd) {
 void handler(int sig) {
 	if (sig == SIGINT) {
 		ERR_PRINT("exited!\n");
-		fprintf(stderr, "\x1b[0m\x1b[?25h");
+		RESET();
+		CURSOR_ON();
 		exit(0);
 	}
 }

@@ -33,4 +33,11 @@ while(0)
 #define WARNING(format,...) PRINT(LOG_YELLOW, format, ##__VA_ARGS__)
 
 
+// cursor
+#define CURSOR_UP(n) fprintf(stderr, "\x1b[%dA", n)
+#define CURSOR_DOWN(n) fprintf(stderr, "\x1b[%dB", n)
 
+#define CURSOR_ON() fprintf(stderr, "\x1b[?25h")
+#define CURSOR_OFF() fprintf(stderr, "\x1b[?25l")
+
+#define RESET() fprintf(stderr, "\x1b[0m")
