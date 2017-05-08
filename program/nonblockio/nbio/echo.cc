@@ -15,12 +15,13 @@ struct Options {
 	int length;
 	int slow;
 	int verbose;
+	int servbuf;
 } g_option;
 
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
 	if (CONTAINS(args, "help")){
-		ERR_QUIT("Usage:\n  %s [--help] [-s] [-h hostname] [-p port] [-l length] [--slow] [-v] [-vv]\n", argv[0]);
+		ERR_QUIT("Usage:\n  %s [--help] [-s] [-h hostname] [-p port] [-l length] [--servbuf size] [--slow] [-v] [-vv]\n", argv[0]);
 	}
 
 
@@ -29,6 +30,7 @@ int main(int argc, char* argv[]) {
 	SETSTR(args, g_option.hostname, "h", "0");
 	SETINT(args, g_option.port, "p", 8000);
 	SETINT(args, g_option.length, "l", 4096);
+	SETINT(args, g_option.servbuf, "servbuf", 4096);
 
 	g_option.verbose = 0;
 	if (CONTAINS(args, "v")) g_option.verbose = 1;
@@ -85,6 +87,12 @@ void client_routine() {
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) ERR_EXIT("socket");
+
+	if (g_option.verbose == 1) {
+		CLEAR();
+		CURSOR_POS(0, 0);
+	}
+
 	showopts(sockfd, "SO_RCVBUF", stderr);
 	showopts(sockfd, "SO_SNDBUF", stderr);
 
@@ -94,6 +102,8 @@ void client_routine() {
 	// 在 connect 之后再设置非阻塞
 	// 设置非阻塞，消除被阻塞的风险
 	setNonblock(sockfd, 1);
+	setNonblock(STDIN_FILENO, 1);
+	setNonblock(STDOUT_FILENO, 1);
 	doClient(sockfd);
 
 	close(sockfd);
@@ -101,7 +111,7 @@ void client_routine() {
 
 void doServer(int sockfd) {
 	int nr, nw, total, totalsend, i;
-	char buf[4096];
+	char *buf = (char*)malloc(g_option.servbuf);
 
 	i = 0;
 	total = 0;
@@ -130,17 +140,18 @@ void doServer(int sockfd) {
 			ERR_EXIT("writen");
 		}
 	}
+	free(buf);
 }
 
 void doClient(int sockfd) {
-	int n, nr, nw, i, length, maxfd, ret, cliclosed, servclosed, totalsend, actualsend;
+	int n, nr, nw, i, length, maxfd, ret, stdinclosed, servclosed, totalsend, actualsend;
   char *to, *from, *tostart, *toend, *fromstart, *fromend;
 	fd_set rfds, wfds, fds;
 
 	i = 0;
 	totalsend = 0;
 	actualsend = 0;
-	cliclosed = 0;
+	stdinclosed = 0;
 	servclosed = 0;
 	length = g_option.length;
 	// 发送缓冲区 
@@ -161,16 +172,12 @@ void doClient(int sockfd) {
 
 	maxfd = sockfd;
 
-	if (g_option.verbose == 1) {
-		CLEAR();
-		CURSOR_POS(0, 0);
-	}
 
 	while(1) {
 		FD_ZERO(&rfds);
 		FD_ZERO(&wfds);
 		// 发送缓冲区有空闲，监听标准输入
-		if (cliclosed == 0 && toend < to + length) 
+		if (stdinclosed == 0 && toend < to + length) 
 			FD_SET(STDIN_FILENO, &rfds);
 		// 接收缓冲区有空闲，监听 sockfd. 如果服务器都关了，就没必要去监听了。
 		if (servclosed == 0 && fromend < from + length)
@@ -194,8 +201,7 @@ void doClient(int sockfd) {
 			nr = read(STDIN_FILENO, toend, n);
 			if (g_option.verbose) {
 				if (g_option.verbose == 1)
-					// 在第一行显示
-					CURSOR_POS(0, 0);
+					CURSOR_POS(3, 1);
 				if (n == nr)
 					LOG("1. read(stdin, %d) = %d\n", n, nr);
 				else
@@ -208,11 +214,15 @@ void doClient(int sockfd) {
 			}
 			else if (nr == 0) {
 				// client no data to send. 
-				cliclosed = 1;
+				stdinclosed = 1;
 				
+				if (g_option.verbose == 1)
+					CURSOR_POS(19, 1);
 				LOG("stdin closed!\n");
 				// 发送缓冲区没有数据要发送了, 但是可能还有数据没有接收完，不能退出
 				if (tostart == toend) {
+					if (g_option.verbose == 1)
+						CURSOR_POS(23, 1);
 					LOG("no data to send\n");
 					shutdown(sockfd, SHUT_WR);
 				}
@@ -233,9 +243,7 @@ void doClient(int sockfd) {
 			nr = read(sockfd, fromend, n);
 			if (g_option.verbose) {
 				if (g_option.verbose == 1) {
-					// 在第二行显示
-					CURSOR_POS(0, 0);
-					CURSOR_DOWN(1);
+					CURSOR_POS(7, 1);
 				}
 				if (n == nr)
 					LOG("2. read(sockfd, %d) = %d\n", n, nr);
@@ -251,12 +259,10 @@ void doClient(int sockfd) {
 			else if (nr == 0) {
 				// server no data to send.
 				if (g_option.verbose == 1) {
-					// 第 5 行显示
-					CURSOR_POS(0, 0);
-					CURSOR_DOWN(4);
+					CURSOR_POS(27, 1);
 				}
 
-				if (cliclosed) {
+				if (stdinclosed) {
 					LOG("server closed!\n");
 				}
 				else {
@@ -270,6 +276,9 @@ void doClient(int sockfd) {
 				// 在程序启动时指定 --slow 参数，就会发现，下面这个 if 根本不会执行
 				// 因为 --slow 选项会减慢客户端处理接收缓冲区的速度
 				if (fromstart == fromend) {
+					if (g_option.verbose == 1) {
+						CURSOR_POS(31, 0);
+					}
 					LOG("1:finished!\n");
 					break;
 				}
@@ -286,9 +295,7 @@ void doClient(int sockfd) {
 			nw = write(STDOUT_FILENO, fromstart, g_option.slow ? 1 : n);
 			if (g_option.verbose) {
 				if (g_option.verbose == 1) {
-					// 在第三行显示
-					CURSOR_POS(0, 0);
-					CURSOR_DOWN(2);
+					CURSOR_POS(11, 0);
 				}
 				if (n == nw)
 					LOG("3. write(stdout, %d) = %d\n", n, nw);
@@ -305,6 +312,9 @@ void doClient(int sockfd) {
 				if (fromstart == fromend) {
 					fromstart = fromend = from;
 					if (servclosed) {
+						if (g_option.verbose == 1) {
+							CURSOR_POS(31, 0);
+						}
 						LOG("2:finished!\n");
 						break;
 					}
@@ -317,9 +327,7 @@ void doClient(int sockfd) {
 			nw = write(sockfd, tostart, n);
 			if (g_option.verbose) {
 				if (g_option.verbose == 1) {
-					// 在第四行显示
-					CURSOR_POS(0, 0);
-					CURSOR_DOWN(3);
+					CURSOR_POS(15, 0);
 				}
 				if (n == nw)
 					LOG("4. write(sockfd, %d) =  %d\n", n, nw);
@@ -336,7 +344,7 @@ void doClient(int sockfd) {
 				if (tostart == toend) {
 					tostart = toend = to;
 					// 数据已经发送完毕，客户端已经没有数据要发送了
-					if (cliclosed) {
+					if (stdinclosed) {
 						shutdown(sockfd, SHUT_WR);
 					}
 				}
