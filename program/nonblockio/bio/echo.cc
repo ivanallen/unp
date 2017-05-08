@@ -79,6 +79,9 @@ void client_routine() {
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) ERR_EXIT("socket");
+	CLEAR();
+	CURSOR_POS(0, 0);
+
 	showopts(sockfd, "SO_RCVBUF", stderr);
 	showopts(sockfd, "SO_SNDBUF", stderr);
 
@@ -124,12 +127,13 @@ void doServer(int sockfd) {
 }
 
 void doClient(int sockfd) {
-	int nr, nw, i, maxfd, ret, cliclose, totalsend, actualsend;
+	int nr, nw, i, j, maxfd, ret, cliclose, totalsend, totalrecv, actualsend;
   char *buf;
 	fd_set rfds, fds;
 
-	i = 0;
+	i = j = 0;
 	totalsend = 0;
+	totalrecv = 0;
 	actualsend = 0;
 	cliclose = 0;
 	// 客户端一次发送 Length 字节
@@ -141,8 +145,6 @@ void doClient(int sockfd) {
 	FD_SET(sockfd, &fds);
 
 	maxfd = sockfd;
-	CLEAR();
-	CURSOR_POS(0, 0);
 
 	while(1) {
 		rfds = fds;
@@ -162,14 +164,14 @@ void doClient(int sockfd) {
 				FD_CLR(STDIN_FILENO, &fds);
 			}
 			else {
-				CURSOR_POS(1, 1);
+				CURSOR_POS(3, 1);
 				LOG("ready to send %d bytes%s\n", nr, dots[i]);
 				nw = writen(sockfd, buf, nr);
 				if (nw < 0) ERR_EXIT("writen to sockfd");
 				totalsend += nw;
-				CURSOR_POS(2, 1);
+				CURSOR_POS(7, 1);
 				LOG("send %d bytes actually%s\n", nw, dots[i]);
-				CURSOR_POS(3, 1);
+				CURSOR_POS(11, 1);
 				LOG("send %d bytes totally%s\n", totalsend, dots[i]);
 				i = (i + 1) % 3;
 			}
@@ -177,10 +179,14 @@ void doClient(int sockfd) {
 
 		if (FD_ISSET(sockfd, &rfds)) {
 			nr = iread(sockfd, buf, g_option.length);
+			totalrecv += nr;
+			CURSOR_POS(15, 1);
+			LOG("recv %d totally%s\n", totalrecv, dots[j]);
+			j = (j + 1) % 3;
 			if (nr < 0) ERR_EXIT("iread from sockfd");
 			else if (nr == 0) {
 				// server no data to send.
-				CURSOR_POS(5, 1);
+				CURSOR_POS(19, 1);
 				if (cliclose) {
 					WARNING("server closed!\n");
 				}
