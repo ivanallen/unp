@@ -118,7 +118,7 @@ void doServer(int sockfd) {
 	totalsend = 0;
 
 	while(1) {
-    nr = iread(sockfd, buf, 4096);
+    nr = iread(sockfd, buf, g_option.servbuf);
 		if (nr < 0) ERR_EXIT("iread");
 		else if (nr == 0) {
 			CURSOR_DOWN(3);
