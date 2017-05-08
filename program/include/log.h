@@ -40,4 +40,12 @@ while(0)
 #define CURSOR_ON() fprintf(stderr, "\x1b[?25h")
 #define CURSOR_OFF() fprintf(stderr, "\x1b[?25l")
 
+#define CURSOR_SAVE() fprintf(stderr, "\x1b[s")
+#define CURSOR_RESTORE() fprintf(stderr, "\x1b[u")
+
+#define CURSOR_POS(y, x) fprintf(stderr, "\x1b[%d;%dH", y, x)
+
 #define RESET() fprintf(stderr, "\x1b[0m")
+
+#define CLEAR() fprintf(stderr, "\x1b[2J")
+

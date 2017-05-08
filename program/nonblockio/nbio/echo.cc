@@ -14,12 +14,13 @@ struct Options {
 	int port;
 	int length;
 	int slow;
+	int verbose;
 } g_option;
 
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
 	if (CONTAINS(args, "help")){
-		ERR_QUIT("Usage:\n  %s [--help] [-s] [-h hostname] [-p port] [-l length] [--slow]\n", argv[0]);
+		ERR_QUIT("Usage:\n  %s [--help] [-s] [-h hostname] [-p port] [-l length] [--slow] [-v] [-vv]\n", argv[0]);
 	}
 
 
@@ -29,6 +30,10 @@ int main(int argc, char* argv[]) {
 	SETINT(args, g_option.port, "p", 8000);
 	SETINT(args, g_option.length, "l", 4096);
 
+	g_option.verbose = 0;
+	if (CONTAINS(args, "v")) g_option.verbose = 1;
+	if (CONTAINS(args, "vv")) g_option.verbose = 2;
+	
 	registSignal(SIGINT, handler);
 
 	LOG("\x1b[?25l");
@@ -156,6 +161,11 @@ void doClient(int sockfd) {
 
 	maxfd = sockfd;
 
+	if (g_option.verbose == 1) {
+		CLEAR();
+		CURSOR_POS(0, 0);
+	}
+
 	while(1) {
 		FD_ZERO(&rfds);
 		FD_ZERO(&wfds);
@@ -180,7 +190,17 @@ void doClient(int sockfd) {
 
 		if (FD_ISSET(STDIN_FILENO, &rfds)) {
 			// 从标准输入读取数据到发送缓冲区空闲区
-			nr = read(STDIN_FILENO, toend, to + length - toend );
+			n = to + length - toend;
+			nr = read(STDIN_FILENO, toend, n);
+			if (g_option.verbose) {
+				if (g_option.verbose == 1)
+					// 在第一行显示
+					CURSOR_POS(0, 0);
+				if (n == nr)
+					LOG("1. read(stdin, %d) = %d\n", n, nr);
+				else
+					WARNING("1. read(stdin, %d) = %d\n", n, nr);
+			}
 			if (nr < 0) {
 				// 这种情况不太可能
 				if (errno != EWOULDBLOCK)
@@ -209,7 +229,20 @@ void doClient(int sockfd) {
 
 		if (FD_ISSET(sockfd, &rfds)) {
 			// 从套接字读取数据到接收缓冲区
-			nr = read(sockfd, fromend, from + length - fromend);
+			n = from + length - fromend;
+			nr = read(sockfd, fromend, n);
+			if (g_option.verbose) {
+				if (g_option.verbose == 1) {
+					// 在第二行显示
+					CURSOR_POS(0, 0);
+					CURSOR_DOWN(1);
+				}
+				if (n == nr)
+					LOG("2. read(sockfd, %d) = %d\n", n, nr);
+				else
+					WARNING("2. read(sockfd, %d) = %d\n", n, nr);
+			}
+
 			if (nr < 0) {
 				// 这似乎也不太可能
 				if (errno != EWOULDBLOCK)
@@ -217,6 +250,12 @@ void doClient(int sockfd) {
 			}
 			else if (nr == 0) {
 				// server no data to send.
+				if (g_option.verbose == 1) {
+					// 第 5 行显示
+					CURSOR_POS(0, 0);
+					CURSOR_DOWN(4);
+				}
+
 				if (cliclosed) {
 					LOG("server closed!\n");
 				}
@@ -245,6 +284,18 @@ void doClient(int sockfd) {
 		// 接收缓冲区有数据未处理
 		if (FD_ISSET(STDOUT_FILENO, &wfds) && ((n = fromend - fromstart) > 0)) {
 			nw = write(STDOUT_FILENO, fromstart, g_option.slow ? 1 : n);
+			if (g_option.verbose) {
+				if (g_option.verbose == 1) {
+					// 在第三行显示
+					CURSOR_POS(0, 0);
+					CURSOR_DOWN(2);
+				}
+				if (n == nw)
+					LOG("3. write(stdout, %d) = %d\n", n, nw);
+				else
+					WARNING("3. write(stdout, %d) = %d\n", n, nw);
+			}
+			
 			if (nw < 0) {
 				if (errno != EWOULDBLOCK)
 					ERR_EXIT("write to stdout");
@@ -264,6 +315,18 @@ void doClient(int sockfd) {
 		// 发送缓冲区有数据可发送
 		if (FD_ISSET(sockfd, &wfds) && ((n = toend - tostart) > 0)) {
 			nw = write(sockfd, tostart, n);
+			if (g_option.verbose) {
+				if (g_option.verbose == 1) {
+					// 在第四行显示
+					CURSOR_POS(0, 0);
+					CURSOR_DOWN(3);
+				}
+				if (n == nw)
+					LOG("4. write(sockfd, %d) =  %d\n", n, nw);
+				else
+					WARNING("4. write(sockfd, %d) =  %d\n", n, nw);
+			}
+
 			if (nw < 0) {
 				if (errno != EWOULDBLOCK)
 					ERR_EXIT("write to sockfd");

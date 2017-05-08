@@ -141,6 +141,8 @@ void doClient(int sockfd) {
 	FD_SET(sockfd, &fds);
 
 	maxfd = sockfd;
+	CLEAR();
+	CURSOR_POS(0, 0);
 
 	while(1) {
 		rfds = fds;
@@ -160,13 +162,15 @@ void doClient(int sockfd) {
 				FD_CLR(STDIN_FILENO, &fds);
 			}
 			else {
+				CURSOR_POS(1, 1);
 				LOG("ready to send %d bytes%s\n", nr, dots[i]);
 				nw = writen(sockfd, buf, nr);
 				if (nw < 0) ERR_EXIT("writen to sockfd");
 				totalsend += nw;
+				CURSOR_POS(2, 1);
 				LOG("send %d bytes actually%s\n", nw, dots[i]);
+				CURSOR_POS(3, 1);
 				LOG("send %d bytes totally%s\n", totalsend, dots[i]);
-				CURSOR_UP(3);
 				i = (i + 1) % 3;
 			}
 		}
@@ -176,9 +180,9 @@ void doClient(int sockfd) {
 			if (nr < 0) ERR_EXIT("iread from sockfd");
 			else if (nr == 0) {
 				// server no data to send.
-				CURSOR_DOWN(3);
+				CURSOR_POS(5, 1);
 				if (cliclose) {
-					ERR_PRINT("server closed!\n");
+					WARNING("server closed!\n");
 				}
 				else {
 					ERR_PRINT("server exception!\n");
