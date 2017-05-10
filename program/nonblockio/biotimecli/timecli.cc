@@ -8,6 +8,7 @@ void doClient(int sockfd);
 
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
+	WARNING("Usage: %s [-h hostname] [-p port]\n", argv[0]);
 
 	SETSTR(args, hostname, "h", "nisttime.carsoncity.k12.mi.us");
 	SETINT(args, port, "p", 13);
