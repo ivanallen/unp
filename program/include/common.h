@@ -60,6 +60,9 @@
     }\
   } while(0)
 
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+
 typedef std::map<std::string, std::string> Args;
 
 
@@ -93,3 +96,5 @@ int writefd(int fd, char* buf, int size, int sendfd);
 int myOpen(const char* pathname, int mode);
 int recvCred(int sockfd, char *buf, int size, struct ucred *cred);
 int sendCred(int sockfd, char *buf, int size);
+int nbioConnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen, int nsec);
+int tcpConnect(const char* hostname, int port);

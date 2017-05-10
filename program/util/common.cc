@@ -487,3 +487,98 @@ int sendCred(int sockfd, char *buf, int size) {
 
 	return nw;
 }
+
+int nbioConnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen, int nsec) {
+	int ret, error;
+	socklen_t len;
+	struct timeval tv;
+	fd_set rfds, wfds;
+
+	setNonblock(sockfd, 1);
+
+	ret = connect(sockfd, addr, addrlen);
+	if (ret < 0) {
+		if (errno != EINPROGRESS) {
+#ifdef DEBUG
+			ERR_PRINT("errno != EINPROGRESS\n");
+#endif
+			close(sockfd);
+			return -1;
+		}
+	}
+	else if (ret == 0) {
+		setNonblock(sockfd, 0);
+#ifdef DEBUG
+		LOG("connect successfully immediately!\n");
+#endif
+		return 0;
+	}
+
+	FD_ZERO(&rfds);
+	FD_ZERO(&wfds);
+	FD_SET(sockfd, &rfds);
+	FD_SET(sockfd, &wfds);
+
+	tv.tv_sec = nsec;
+	tv.tv_usec = 0;
+
+	ret = select(sockfd + 1, &rfds, &wfds, NULL, nsec ? &tv : NULL);
+	if (ret < 0) {
+#ifdef DEBUG
+		ERR_PRINT("select error\n");
+#endif
+		close(sockfd);
+		return -1;
+	}
+	else if (ret == 0) {
+		errno == ETIMEDOUT;
+#ifdef DEBUG
+		ERR_PRINT("select timedout\n");
+#endif
+		close(sockfd);
+		return -1;
+	}
+
+	// 如果正常，一定可写，不一定可读
+	// 如果出错，则一定可读可写
+	if (FD_ISSET(sockfd, &rfds) || FD_ISSET(sockfd, &wfds)) {
+		len = sizeof(error);
+		ret = getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &error, &len);
+		if (ret < 0) {
+#ifdef DEBUG
+			ERR_PRINT("getsockopt return < 0\n");
+#endif
+			close(sockfd);
+			return -1;
+		}
+	}
+
+	if (error) {
+#ifdef DEBUG
+		ERR_PRINT("connect error\n");
+#endif
+		errno = error;
+		close(sockfd);
+		return -1;
+	}
+
+	setNonblock(sockfd, 0);
+#ifdef DEBUG
+	ERR_PRINT("connect success\n");
+#endif
+	return 0;
+}
+
+int tcpConnect(const char* hostname, int port) {
+	int ret, sockfd;
+	struct sockaddr_in servaddr;
+
+	ret = resolve(hostname, port, &servaddr);
+	if (ret < 0) return -1;
+
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	ret = connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
+	if (ret < 0) return -1;
+
+	return sockfd;
+}
