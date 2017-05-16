@@ -586,7 +586,7 @@ int tcpConnect(const char* hostname, int port) {
 void printData(const unsigned char* data, int len, int cols) {
 	int i;
 	for (i = 0; i < len; ++i) {
-		if (i % cols == 0) LOG("| %02x ");
+		if (i % cols == 0) LOG("| %02x ", data[i]);
 		else LOG("%02x ", data[i]);
 		if ((i + 1) % cols == 0) LOG("|\n");
 	}
