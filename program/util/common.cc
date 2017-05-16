@@ -582,3 +582,53 @@ int tcpConnect(const char* hostname, int port) {
 
 	return sockfd;
 }
+
+void printData(const unsigned char* data, int len, int cols) {
+	int i;
+	for (i = 0; i < len; ++i) {
+		if (i % cols == 0) LOG("| %02x ");
+		else LOG("%02x ", data[i]);
+		if ((i + 1) % cols == 0) LOG("|\n");
+	}
+
+	// 补齐空白
+	if (i == len && i % cols != 0) {
+		while(1) {
+			if (i % cols != 0)
+				LOG("-- ");
+			else { 
+				LOG("|\n");
+				break;
+			}
+			++i;
+		}
+	}
+}
+
+int printIp(const struct ip *ip, int len) {
+	int iphlen, flag, offset;
+	unsigned char *data;
+
+	iphlen = ip->ip_hl<< 2;
+	data = (unsigned char*)ip + iphlen;
+
+	len -= iphlen;
+
+
+	WARNING("version:          %d\n", ip->ip_v);
+	WARNING("header len:       %d\n", iphlen);
+	WARNING("tos:              %d\n", ip->ip_tos);
+	WARNING("total len:        %d\n", ntohs(ip->ip_len));
+	WARNING("id:               %d\n", ntohs(ip->ip_id));
+	flag = ntohs(ip->ip_off) & 0xe000;
+	WARNING("fragment flag:    [RF:%d, DF:%d, MF:%d]\n"
+			, flag & IP_RF ? 1:0, flag & IP_DF ? 1:0, flag & IP_MF ? 1:0);
+	WARNING("fragment offset:  %d\n", ntohs(ip->ip_off) & 0x1fff);
+	WARNING("ttl:              %d\n", ip->ip_ttl);
+	WARNING("protocol:         %d\n", ip->ip_p);
+	WARNING("checksum:         0x%04x\n", ntohs(ip->ip_sum));
+	WARNING("src ip:           %s\n", inet_ntoa(ip->ip_src));
+	WARNING("dst ip:           %s\n", inet_ntoa(ip->ip_dst));
+	printData(data, len);
+	return 0;
+}

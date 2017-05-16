@@ -1,3 +1,6 @@
+#ifndef __COMMON_H__
+#define __COMMON_H__
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -27,7 +30,9 @@
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <log.h>
+
+#include "log.h"
+#include "ip.h"
 
 #define CONTAINS(container,element) (container.find(element) != container.end())
 #define SETINT(args,val,opt,def) \
@@ -98,3 +103,9 @@ int recvCred(int sockfd, char *buf, int size, struct ucred *cred);
 int sendCred(int sockfd, char *buf, int size);
 int nbioConnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen, int nsec);
 int tcpConnect(const char* hostname, int port);
+void printData(const unsigned char* data, int len, int cols = 16);
+int printIp(const struct ip *ip, int len);
+
+
+
+#endif // __COMMON_H_HH

@@ -1,3 +1,7 @@
+#ifndef __LOG_H__
+#define __LOG_H__
+
+
 #define PRINT(COLOR, format,...) do { \
 	fprintf(stderr, "\x1b[K"); \
 	fprintf(stderr, COLOR); \
@@ -49,3 +53,4 @@ while(0)
 
 #define CLEAR() fprintf(stderr, "\x1b[2J")
 
+#endif // __LOG_H__
