@@ -615,6 +615,7 @@ int printIp(const struct ip *ip, int len) {
 	len -= iphlen;
 
 
+	ERR_PRINT("------------ ip header ------------\n");
 	WARNING("version:          %d\n", ip->ip_v);
 	WARNING("header len:       %d\n", iphlen);
 	WARNING("tos:              %d\n", ip->ip_tos);
@@ -631,4 +632,16 @@ int printIp(const struct ip *ip, int len) {
 	WARNING("dst ip:           %s\n", inet_ntoa(ip->ip_dst));
 	printData(data, len);
 	return 0;
+}
+
+void printIcmp(struct icmp* icmp, int len) {
+	int hlen;
+
+	ERR_PRINT("------------ icmp header ------------\n");
+	WARNING("type:             %d\n", icmp->icmp_type);
+	WARNING("code:             %d\n", icmp->icmp_code);
+	WARNING("checksum:         %04x\n", icmp->icmp_cksum);
+	
+	hlen = sizeof(struct icmp);
+	printData((unsigned char*)icmp + hlen, len - hlen);
 }

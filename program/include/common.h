@@ -33,6 +33,7 @@
 
 #include "log.h"
 #include "ip.h"
+#include "icmp.h"
 
 #define CONTAINS(container,element) (container.find(element) != container.end())
 #define SETINT(args,val,opt,def) \
@@ -105,6 +106,7 @@ int nbioConnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen, int 
 int tcpConnect(const char* hostname, int port);
 void printData(const unsigned char* data, int len, int cols = 16);
 int printIp(const struct ip *ip, int len);
+void printIcmp(struct icmp* icmp, int len);
 
 
 
