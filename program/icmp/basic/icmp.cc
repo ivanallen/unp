@@ -3,14 +3,18 @@
 #define BUF_SIZE 4096
 char buf[BUF_SIZE];
 
+int showiphdr = 0;
 
 int main(int argc, char* argv[]) {
 	struct sockaddr_in from;
 	struct ip *ip;
 	struct icmp *icmp;
 	socklen_t len;
-
 	int nr, ret, sockfd, protocol, iphlen, icmplen;
+
+	Args args = parsecmdline(argc, argv);
+
+	SETBOOL(args, showiphdr, "showip", 0);
 
 	sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (sockfd < 0) ERR_EXIT("socket");
@@ -27,7 +31,9 @@ int main(int argc, char* argv[]) {
 		// 打印 ip 首部和数据部分
 		// buf 是 ip 首部开始第一个字节的地址
 	  ip = (struct ip*)buf;	
-		printIp(ip, nr);
+
+		if (showiphdr)
+			printIp(ip, nr);
 
 		// ip 头部长度
 		iphlen = (ip->ip_hl) << 2;
