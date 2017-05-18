@@ -14,9 +14,9 @@ $ make
 
 部分程序需要安装 sctp 开发环境
 
- : ubuntu：sudo apt-get install libsctp-dev
+ :ubuntu：sudo apt-get install libsctp-dev
 
- : centos: sudo yum install lksctp-tools-devel.x86_64 或者 sudo yum install lksctp-tools-devel.i686
+ :centos: sudo yum install lksctp-tools-devel.x86_64 或者 sudo yum install lksctp-tools-devel.i686
 
 # 博客地址
 

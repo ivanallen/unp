@@ -1,4 +1,4 @@
-main:concurrent_test echo options echo_udp advcio template advcio unixdomainprotocols
+main:concurrent_test echo options echo_udp advcio template advcio unixdomainprotocols icmp
 	$(MAKE) -C./concurrent_test
 	$(MAKE) -C./echo
 	$(MAKE) -C./options
@@ -6,4 +6,5 @@ main:concurrent_test echo options echo_udp advcio template advcio unixdomainprot
 	$(MAKE) -C./template
 	$(MAKE) -C./advcio
 	$(MAKE) -C./unixdomainprotocols
+	$(MAKE) -C./icmp
 

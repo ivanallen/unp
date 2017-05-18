@@ -645,3 +645,22 @@ void printIcmp(struct icmp* icmp, int len) {
 	hlen = sizeof(struct icmp);
 	printData((unsigned char*)icmp + hlen, len - hlen);
 }
+
+unsigned short cksum(unsigned short *addr, int len){
+	unsigned int sum = 0;  
+	while(len > 1){
+		sum += *addr++;
+		len -= 2;
+	}
+
+	// 处理剩下的一个字节
+	if(len == 1){
+		sum += *(unsigned char*)addr;
+	}
+
+	// 将32位的高16位与低16位相加
+	sum = (sum >> 16) + (sum & 0xffff);
+	sum += (sum >> 16);
+
+	return (unsigned short) ~sum;
+}

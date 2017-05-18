@@ -1,2 +1,4 @@
 ip/ip
 basic/icmp
+icmpecho/icmp
+icmpecho/myping

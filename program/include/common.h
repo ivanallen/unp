@@ -107,6 +107,7 @@ int tcpConnect(const char* hostname, int port);
 void printData(const unsigned char* data, int len, int cols = 16);
 int printIp(const struct ip *ip, int len);
 void printIcmp(struct icmp* icmp, int len);
+unsigned short cksum(unsigned short *addr, int len);
 
 
 

@@ -10,5 +10,15 @@ struct icmp {
 };
 
 
+// icmp 回显报文头部
+struct icmp_echo {
+	uint8_t icmp_type;
+	uint8_t icmp_code;
+	uint16_t icmp_cksum;
+	uint16_t icmp_id;
+	uint16_t icmp_seq;
+	char icmp_data[0];
+};
+
 #endif //__ICMP_H__
 
