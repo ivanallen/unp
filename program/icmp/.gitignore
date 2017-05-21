@@ -2,3 +2,5 @@ ip/ip
 basic/icmp
 icmpecho/icmp
 icmpecho/myping
+icmpmask/mask
+icmptime/timestamp
