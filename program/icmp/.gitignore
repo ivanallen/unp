@@ -4,3 +4,4 @@ icmpecho/icmp
 icmpecho/myping
 icmpmask/mask
 icmptime/timestamp
+tracert
