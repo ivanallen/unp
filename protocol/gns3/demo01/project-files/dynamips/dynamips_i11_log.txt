@@ -1,0 +1,40 @@
+May 23 11:23:10.613 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
+May 23 11:23:10.615 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 11444.
+May 23 11:23:11.183 HYPERVISOR: exec_cmd: hypervisor version 
+May 23 11:23:11.184 HYPERVISOR: exec_cmd: hypervisor uuid 
+May 23 11:23:11.185 HYPERVISOR: exec_cmd: hypervisor working_dir F:/blog/unp/protocol/gns3/demo01\project-files\dynamips 
+May 23 11:23:11.185 GENERAL: working_dir=F:/blog/unp/protocol/gns3/demo01\project-files\dynamips
+May 23 11:23:11.186 HYPERVISOR: exec_cmd: vm create PC4 7 c3600 
+May 23 11:23:11.188 VM: VM PC4 created.
+May 23 11:23:11.189 HYPERVISOR: exec_cmd: vm set_con_tcp_port PC4 2005 
+May 23 11:23:11.189 HYPERVISOR: exec_cmd: c3600 get_mac_addr PC4 
+May 23 11:23:11.191 HYPERVISOR: exec_cmd: vm set_ram PC4 192 
+May 23 11:23:11.192 HYPERVISOR: exec_cmd: vm set_exec_area PC4 64 
+May 23 11:23:11.193 HYPERVISOR: exec_cmd: vm set_nvram PC4 256 
+May 23 11:23:11.194 HYPERVISOR: exec_cmd: vm get_status PC4 
+May 23 11:23:11.196 HYPERVISOR: exec_cmd: vm slot_add_binding PC4 1 0 NM-4T 
+May 23 11:23:11.197 HYPERVISOR: exec_cmd: vm set_ios PC4 G:\doc\CCNA\images\IOS\C3640-JK.BIN 
+May 23 11:23:11.197 HYPERVISOR: exec_cmd: c3600 set_mac_addr PC4 cc07.2a6c.0000 
+May 23 11:23:11.198 HYPERVISOR: exec_cmd: vm get_status PC4 
+May 23 11:23:11.198 HYPERVISOR: exec_cmd: vm slot_add_binding PC4 0 0 NM-4E 
+May 23 11:23:11.199 HYPERVISOR: exec_cmd: vm get_status PC4 
+May 23 11:23:11.199 HYPERVISOR: exec_cmd: vm set_idle_pc PC4 0x6046d710 
+May 23 11:23:11.201 HYPERVISOR: exec_cmd: vm set_config PC4 configs/i7_startup-config.cfg 
+May 23 11:23:11.201 HYPERVISOR: exec_cmd: vm set_ghost_status PC4 2 
+May 23 11:23:11.202 HYPERVISOR: exec_cmd: vm set_ghost_file PC4 C3640-JK.BIN-192.ghost 
+May 23 11:23:11.407 HYPERVISOR: exec_cmd: nio create_udp udp-57a16a9a-d77e-44d9-953d-3dcc95f4cf4b 10011 127.0.0.1 10010 
+May 23 11:23:11.409 HYPERVISOR: exec_cmd: vm slot_add_nio_binding PC4 0 0 udp-57a16a9a-d77e-44d9-953d-3dcc95f4cf4b 
+May 23 11:23:11.410 HYPERVISOR: exec_cmd: vm get_status PC4 
+May 23 11:23:19.248 HYPERVISOR: exec_cmd: vm get_status PC4 
+May 23 11:23:19.254 HYPERVISOR: exec_cmd: vm start PC4 
+May 23 21:18:41.530 HYPERVISOR: exec_cmd: vm get_status PC4 
+May 23 21:18:41.587 HYPERVISOR: exec_cmd: vm stop PC4 
+May 23 21:18:42.430 VM: VM PC4 shutdown.
+May 23 21:18:46.144 HYPERVISOR: exec_cmd: vm get_status PC4 
+May 23 21:18:46.147 HYPERVISOR: exec_cmd: vm extract_config PC4 
+May 23 21:18:46.298 HYPERVISOR: exec_cmd: vm extract_config PC4 
+May 23 21:18:46.308 HYPERVISOR: exec_cmd: vm delete PC4 
+May 23 21:18:46.308 VM: VM PC4 destroyed.
+May 23 21:18:46.316 HYPERVISOR: exec_cmd: hypervisor stop 
+May 23 21:18:46.365 HYPERVISOR: Stopped.
+May 23 21:18:46.365 GENERAL: reset done.

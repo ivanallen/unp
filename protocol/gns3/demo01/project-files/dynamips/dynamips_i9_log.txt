@@ -1,54 +1,49 @@
-Apr 09 15:59:48.739 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
-Apr 09 15:59:48.741 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 13233.
-Apr 09 15:59:49.112 HYPERVISOR: exec_cmd: hypervisor version 
-Apr 09 15:59:49.113 HYPERVISOR: exec_cmd: hypervisor uuid 
-Apr 09 15:59:49.113 HYPERVISOR: exec_cmd: hypervisor working_dir F:/blog/unp/gns3/demo01\project-files\dynamips 
-Apr 09 15:59:49.113 GENERAL: working_dir=F:/blog/unp/gns3/demo01\project-files\dynamips
-Apr 09 15:59:49.114 HYPERVISOR: exec_cmd: vm create R3 5 c3600 
-Apr 09 15:59:49.130 VM: VM R3 created.
-Apr 09 15:59:49.130 HYPERVISOR: exec_cmd: vm set_con_tcp_port R3 2003 
-Apr 09 15:59:49.131 HYPERVISOR: exec_cmd: c3600 get_mac_addr R3 
-Apr 09 15:59:49.132 HYPERVISOR: exec_cmd: vm get_status R3 
-Apr 09 15:59:49.132 HYPERVISOR: exec_cmd: vm slot_add_binding R3 0 0 NM-4E 
-Apr 09 15:59:49.133 HYPERVISOR: exec_cmd: vm set_ios R3 G:\doc\CCNA\images\IOS\C3640-JK.BIN 
-Apr 09 15:59:49.134 HYPERVISOR: exec_cmd: vm set_ram R3 192 
-Apr 09 15:59:49.134 HYPERVISOR: exec_cmd: vm set_nvram R3 256 
-Apr 09 15:59:49.135 HYPERVISOR: exec_cmd: vm get_status R3 
-Apr 09 15:59:49.135 HYPERVISOR: exec_cmd: vm set_idle_pc R3 0x6046d710 
-Apr 09 15:59:49.135 HYPERVISOR: exec_cmd: vm set_exec_area R3 64 
-Apr 09 15:59:49.136 HYPERVISOR: exec_cmd: vm get_status R3 
-Apr 09 15:59:49.136 HYPERVISOR: exec_cmd: vm slot_add_binding R3 1 0 NM-4T 
-Apr 09 15:59:49.139 HYPERVISOR: exec_cmd: vm set_config R3 configs/i5_startup-config.cfg 
-Apr 09 15:59:49.140 HYPERVISOR: exec_cmd: vm set_ghost_status R3 2 
-Apr 09 15:59:49.140 HYPERVISOR: exec_cmd: vm set_ghost_file R3 C3640-JK.BIN-192.ghost 
-Apr 09 16:00:09.778 HYPERVISOR: exec_cmd: vm rename R3 PC3 
-Apr 09 16:01:25.771 HYPERVISOR: exec_cmd: nio create_udp udp-a067d1c6-63b9-4066-85d6-96f356a3e6f5 10002 127.0.0.1 10003 
-Apr 09 16:01:25.787 HYPERVISOR: exec_cmd: vm slot_add_nio_binding PC3 0 0 udp-a067d1c6-63b9-4066-85d6-96f356a3e6f5 
-Apr 09 16:01:25.788 HYPERVISOR: exec_cmd: vm get_status PC3 
-Apr 09 16:02:37.770 HYPERVISOR: exec_cmd: vm get_status PC3 
-Apr 09 16:02:37.772 HYPERVISOR: exec_cmd: vm start PC3 
-Apr 09 16:05:07.795 HYPERVISOR: exec_cmd: vm extract_config PC3 
-Apr 09 16:13:08.052 HYPERVISOR: exec_cmd: vm extract_config PC3 
-Apr 09 16:13:13.465 HYPERVISOR: exec_cmd: vm get_status PC3 
-Apr 09 16:13:13.469 HYPERVISOR: exec_cmd: vm stop PC3 
-Apr 09 16:13:13.620 VM: VM PC3 shutdown.
-Apr 09 16:13:16.569 HYPERVISOR: exec_cmd: vm get_status PC3 
-Apr 09 16:13:16.591 HYPERVISOR: exec_cmd: vm start PC3 
-Apr 09 16:16:04.843 HYPERVISOR: exec_cmd: vm get_status PC3 
-Apr 09 16:16:04.847 HYPERVISOR: exec_cmd: vm stop PC3 
-Apr 09 16:16:05.011 VM: VM PC3 shutdown.
-Apr 09 16:16:06.462 HYPERVISOR: exec_cmd: vm extract_config PC3 
-Apr 09 16:16:07.173 HYPERVISOR: exec_cmd: vm extract_config PC3 
-Apr 09 16:17:08.214 HYPERVISOR: exec_cmd: vm get_status PC3 
-Apr 09 16:17:08.219 HYPERVISOR: exec_cmd: vm start PC3 
-Apr 09 19:02:41.730 HYPERVISOR: exec_cmd: vm get_status PC3 
-Apr 09 19:02:41.743 HYPERVISOR: exec_cmd: vm stop PC3 
-Apr 09 19:02:42.093 VM: VM PC3 shutdown.
-Apr 09 19:02:48.909 HYPERVISOR: exec_cmd: vm extract_config PC3 
-Apr 09 19:02:57.927 HYPERVISOR: exec_cmd: vm get_status PC3 
-Apr 09 19:02:57.937 HYPERVISOR: exec_cmd: vm extract_config PC3 
-Apr 09 19:02:57.938 HYPERVISOR: exec_cmd: vm delete PC3 
-Apr 09 19:02:57.938 VM: VM PC3 destroyed.
-Apr 09 19:02:57.953 HYPERVISOR: exec_cmd: hypervisor stop 
-Apr 09 19:02:58.123 HYPERVISOR: Stopped.
-Apr 09 19:02:58.123 GENERAL: reset done.
+May 23 11:23:07.909 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
+May 23 11:23:07.910 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 11427.
+May 23 11:23:08.259 HYPERVISOR: exec_cmd: hypervisor version 
+May 23 11:23:08.260 HYPERVISOR: exec_cmd: hypervisor uuid 
+May 23 11:23:08.260 HYPERVISOR: exec_cmd: hypervisor working_dir F:/blog/unp/protocol/gns3/demo01\project-files\dynamips 
+May 23 11:23:08.260 GENERAL: working_dir=F:/blog/unp/protocol/gns3/demo01\project-files\dynamips
+May 23 11:23:08.261 HYPERVISOR: exec_cmd: vm create PC1 4 c3600 
+May 23 11:23:08.731 VM: VM PC1 created.
+May 23 11:23:08.732 HYPERVISOR: exec_cmd: vm set_con_tcp_port PC1 2007 
+May 23 11:23:08.733 HYPERVISOR: exec_cmd: c3600 get_mac_addr PC1 
+May 23 11:23:08.733 HYPERVISOR: exec_cmd: vm set_ram PC1 192 
+May 23 11:23:08.734 HYPERVISOR: exec_cmd: vm set_exec_area PC1 64 
+May 23 11:23:08.734 HYPERVISOR: exec_cmd: vm set_nvram PC1 256 
+May 23 11:23:08.735 HYPERVISOR: exec_cmd: vm get_status PC1 
+May 23 11:23:08.735 HYPERVISOR: exec_cmd: vm slot_add_binding PC1 1 0 NM-4T 
+May 23 11:23:08.736 HYPERVISOR: exec_cmd: vm set_ios PC1 G:\doc\CCNA\images\IOS\C3640-JK.BIN 
+May 23 11:23:08.737 HYPERVISOR: exec_cmd: c3600 set_mac_addr PC1 cc04.2ae0.0000 
+May 23 11:23:08.737 HYPERVISOR: exec_cmd: vm get_status PC1 
+May 23 11:23:08.738 HYPERVISOR: exec_cmd: vm slot_add_binding PC1 0 0 NM-4E 
+May 23 11:23:08.738 HYPERVISOR: exec_cmd: vm get_status PC1 
+May 23 11:23:08.739 HYPERVISOR: exec_cmd: vm set_idle_pc PC1 0x6046d710 
+May 23 11:23:08.740 HYPERVISOR: exec_cmd: vm set_config PC1 configs/i4_startup-config.cfg 
+May 23 11:23:09.447 HYPERVISOR: exec_cmd: vm set_ghost_status PC1 2 
+May 23 11:23:09.448 HYPERVISOR: exec_cmd: vm set_ghost_file PC1 C3640-JK.BIN-192.ghost 
+May 23 11:23:10.081 HYPERVISOR: exec_cmd: nio create_udp udp-f14002b0-07e6-404c-965e-998a90a3329f 10009 127.0.0.1 10008 
+May 23 11:23:10.143 HYPERVISOR: exec_cmd: vm slot_add_nio_binding PC1 0 0 udp-f14002b0-07e6-404c-965e-998a90a3329f 
+May 23 11:23:10.148 HYPERVISOR: exec_cmd: vm get_status PC1 
+May 23 11:23:19.250 HYPERVISOR: exec_cmd: vm get_status PC1 
+May 23 11:23:19.255 HYPERVISOR: exec_cmd: vm start PC1 
+May 23 15:51:11.299 HYPERVISOR: exec_cmd: nio bind_filter udp-f14002b0-07e6-404c-965e-998a90a3329f 2 capture 
+May 23 15:51:11.323 HYPERVISOR: exec_cmd: nio setup_filter udp-f14002b0-07e6-404c-965e-998a90a3329f 2 en10mb F:/blog/unp/protocol/gns3/demo01\project-files\captures\PC1_Ethernet0-0_to_SW1_FastEthernet0-3.pcap 
+May 23 15:51:58.227 HYPERVISOR: exec_cmd: nio unbind_filter udp-f14002b0-07e6-404c-965e-998a90a3329f 2 
+May 23 16:35:53.392 HYPERVISOR: exec_cmd: nio bind_filter udp-f14002b0-07e6-404c-965e-998a90a3329f 2 capture 
+May 23 16:35:53.408 HYPERVISOR: exec_cmd: nio setup_filter udp-f14002b0-07e6-404c-965e-998a90a3329f 2 en10mb F:/blog/unp/protocol/gns3/demo01\project-files\captures\PC1_Ethernet0-0_to_SW1_FastEthernet0-3.pcap 
+May 23 16:36:38.236 HYPERVISOR: exec_cmd: nio unbind_filter udp-f14002b0-07e6-404c-965e-998a90a3329f 2 
+May 23 16:37:40.424 HYPERVISOR: exec_cmd: nio bind_filter udp-f14002b0-07e6-404c-965e-998a90a3329f 2 capture 
+May 23 16:37:40.425 HYPERVISOR: exec_cmd: nio setup_filter udp-f14002b0-07e6-404c-965e-998a90a3329f 2 en10mb F:/blog/unp/protocol/gns3/demo01\project-files\captures\PC1_Ethernet0-0_to_SW1_FastEthernet0-3.pcap 
+May 23 16:38:25.861 HYPERVISOR: exec_cmd: nio unbind_filter udp-f14002b0-07e6-404c-965e-998a90a3329f 2 
+May 23 21:18:41.584 HYPERVISOR: exec_cmd: vm get_status PC1 
+May 23 21:18:41.650 HYPERVISOR: exec_cmd: vm stop PC1 
+May 23 21:18:42.277 VM: VM PC1 shutdown.
+May 23 21:18:46.110 HYPERVISOR: exec_cmd: vm extract_config PC1 
+May 23 21:18:46.260 HYPERVISOR: exec_cmd: vm get_status PC1 
+May 23 21:18:46.300 HYPERVISOR: exec_cmd: vm extract_config PC1 
+May 23 21:18:46.307 HYPERVISOR: exec_cmd: vm delete PC1 
+May 23 21:18:46.308 VM: VM PC1 destroyed.
+May 23 21:18:46.317 HYPERVISOR: exec_cmd: hypervisor stop 
+May 23 21:18:46.366 HYPERVISOR: Stopped.
+May 23 21:18:46.366 GENERAL: reset done.
