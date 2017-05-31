@@ -218,6 +218,7 @@ void setLinger(int sockfd, int onoff, int seconds) {
 	}
 }
 
+
 void setSendBufSize(int sockfd, int size) {
 	int ret;
 	ret = setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
@@ -257,6 +258,15 @@ void setCork(int sockfd, int onoff) {
 		ERR_EXIT("setCork");
 	}
 }
+
+void setBroadcast(int sockfd, int onoff) {
+	int ret;
+	ret = setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &onoff, sizeof(onoff));
+	if (ret < 0) {
+		ERR_EXIT("setBroadcast");
+	}
+}
+
 void setRecvTimeout(int sockfd, int nsec) {
 	int ret;
 	struct timeval tv;

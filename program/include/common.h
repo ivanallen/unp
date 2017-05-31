@@ -92,6 +92,7 @@ void setSendBufSize(int sockfd, int size);
 void setRecvBufSize(int sockfd, int size);
 void setMaxSegSize(int sockfd, int size);
 void setNoDelay(int sockfd, int onoff);
+void setBroadcast(int sockfd, int onoff);
 void setCork(int sockfd, int onoff);
 void setRecvTimeout(int sockfd, int nsec);
 void setSendTimeout(int sockfd, int nsec);
