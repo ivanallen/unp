@@ -95,13 +95,25 @@ void doServer(int sockfd) {
 }
 
 void doClient(int sockfd) {
-	int ret, len, nr, nw;
+	int ret, len, nr, nw, maxfd;
 	struct sockaddr_in servaddr, cliaddr;
 	char buf[4096];
 	socklen_t addrlen;
+	sigset_t stalarm, stempty;
+	fd_set rfds;
+
+	sigemptyset(&stalarm);
+	sigemptyset(&stempty);
+	sigaddset(&stalarm, SIGALRM);
+
+	FD_ZERO(&rfds);
+	maxfd = sockfd;
+
 
 	ret = resolve(g_option.hostname, g_option.port, &servaddr);
 	if (ret < 0) ERR_EXIT("resolve");
+
+	sigprocmask(SIG_BLOCK, &stalarm, NULL);
 
   while(1) {
 		nr = iread(STDIN_FILENO, buf, 4096);
@@ -115,15 +127,17 @@ void doClient(int sockfd) {
 			ERR_EXIT("sendto");
 		}
 		alarm(2);
+
 		for(;;) {
 			addrlen = sizeof(cliaddr);
-			nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&cliaddr, &addrlen); 
-			// 程序有漏洞，可能会因为竞争问题导致永久阻塞。实际上这个问题在前面写的程序中都可能会出现。
-			// 如果 alarm 信号在 recvfrom 返回后产生，程序就会永久阻塞，我们暂时不考虑这种情况。
-			if (nr < 0) {
+			FD_SET(sockfd, &rfds);
+			sleep(3);
+			ret = pselect(maxfd + 1, &rfds, NULL, NULL, NULL, &stempty);
+			if (ret < 0) {
 				if (errno == EINTR) break;
-				ERR_EXIT("recvfrom");
+				ERR_EXIT("pselect");
 			}
+			nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&cliaddr, &addrlen); 
 
 			LOG("from %s:%d ", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 			nw = iwrite(STDOUT_FILENO, buf, nr);
