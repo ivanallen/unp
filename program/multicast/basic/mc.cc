@@ -8,19 +8,21 @@ void client_routine();
 struct Options {
 	int isServer;
 	char hostname[32];
+	char multiAddr[32];
 	int port;
 } g_option;
 
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
-		printf("Usage:\n  %s [-s] [-h hostname] [-p port]\n", argv[0]);
+		printf("Usage:\n  %s [-s] [-h hostname] [-g group] [-p port]\n", argv[0]);
 		return 1;
 	}
 
 
 	SETBOOL(args, g_option.isServer, "s", 0);
 	SETSTR(args, g_option.hostname, "h", "0");
+	SETSTR(args, g_option.multiAddr, "g", "230.2.2.2");
 	SETINT(args, g_option.port, "p", 8000);
 
 	if (g_option.isServer) {
@@ -48,10 +50,12 @@ void server_routine() {
 	ret = bind(sockfd, (struct sockaddr*)&servaddr, sizeof servaddr);
 	if (ret < 0) ERR_EXIT("bind");
 
-	mreq.imr_multiaddr.s_addr = inet_addr("224.0.0.1");
+	mreq.imr_multiaddr.s_addr = inet_addr(g_option.multiAddr);
 	mreq.imr_interface.s_addr = servaddr.sin_addr.s_addr;
 	ret = setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 	if (ret < 0) ERR_EXIT("setsockopt:IP_ADD_MEMBERSHIP");
+
+	LOG("multicast group: %s\n", g_option.multiAddr);
 
 
 	doServer(sockfd);
