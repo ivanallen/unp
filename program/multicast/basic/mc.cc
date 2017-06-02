@@ -56,6 +56,9 @@ void server_routine() {
 
 	doServer(sockfd);
 
+	ret = setsockopt(sockfd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq));
+	if (ret < 0) ERR_EXIT("setsockopt:IP_DROP_MEMBERSHIP");
+
 	close(sockfd);
 }
 
@@ -94,7 +97,8 @@ void doServer(int sockfd) {
 
 void doClient(int sockfd) {
 	int ret, len, nr, nw;
-	struct sockaddr_in servaddr;
+	struct sockaddr_in servaddr, cliaddr;
+	socklen_t addrlen;
 	char buf[4096];
 
 	ret = resolve(g_option.hostname, g_option.port, &servaddr);
@@ -111,11 +115,13 @@ void doClient(int sockfd) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("sendto");
 		}
-		nr = recvfrom(sockfd, buf, 4096, 0, NULL, NULL); 
+		addrlen = sizeof(cliaddr);
+		nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&cliaddr, &addrlen); 
 		if (nr < 0) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("recvfrom");
 		}
+		LOG("from %s:%d ", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
 		nw = iwrite(STDOUT_FILENO, buf, nr);
 		if (nr < 0) {
 			ERR_EXIT("iwrite");
