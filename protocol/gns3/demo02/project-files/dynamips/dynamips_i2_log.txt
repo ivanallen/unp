@@ -1,75 +1,57 @@
-May 25 11:10:21.136 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
-May 25 11:10:21.137 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 9610.
-May 25 11:10:21.598 HYPERVISOR: exec_cmd: hypervisor version 
-May 25 11:10:21.599 HYPERVISOR: exec_cmd: hypervisor uuid 
-May 25 11:10:21.599 HYPERVISOR: exec_cmd: hypervisor working_dir F:\blog\unp\protocol\gns3\demo02\project-files\dynamips 
-May 25 11:10:21.605 GENERAL: working_dir=F:\blog\unp\protocol\gns3\demo02\project-files\dynamips
-May 25 11:10:21.606 HYPERVISOR: exec_cmd: vm create R2 2 c3600 
-May 25 11:10:21.608 VM: VM R2 created.
-May 25 11:10:21.609 HYPERVISOR: exec_cmd: vm set_con_tcp_port R2 2002 
-May 25 11:10:21.609 HYPERVISOR: exec_cmd: c3600 get_mac_addr R2 
-May 25 11:10:21.610 HYPERVISOR: exec_cmd: c3600 set_mac_addr R2 cc02.22e0.0000 
-May 25 11:10:21.610 HYPERVISOR: exec_cmd: vm set_nvram R2 256 
-May 25 11:10:21.611 HYPERVISOR: exec_cmd: vm set_ram R2 192 
-May 25 11:10:21.611 HYPERVISOR: exec_cmd: vm set_exec_area R2 64 
-May 25 11:10:21.612 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 11:10:21.612 HYPERVISOR: exec_cmd: vm slot_add_binding R2 1 0 NM-4T 
-May 25 11:10:21.613 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 11:10:21.613 HYPERVISOR: exec_cmd: vm set_idle_pc R2 0x6046d710 
-May 25 11:10:21.614 HYPERVISOR: exec_cmd: vm set_ios R2 G:\doc\CCNA\images\IOS\C3640-JK.BIN 
-May 25 11:10:21.615 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 11:10:21.615 HYPERVISOR: exec_cmd: vm slot_add_binding R2 0 0 NM-4E 
-May 25 11:10:21.617 HYPERVISOR: exec_cmd: vm set_config R2 configs/i2_startup-config.cfg 
-May 25 11:10:21.618 HYPERVISOR: exec_cmd: vm create Ghost 0 c3600 
-May 25 11:10:21.620 VM: VM Ghost created.
-May 25 11:10:21.621 HYPERVISOR: exec_cmd: vm set_ios Ghost G:\doc\CCNA\images\IOS\C3640-JK.BIN 
-May 25 11:10:21.621 HYPERVISOR: exec_cmd: vm set_ghost_status Ghost 1 
-May 25 11:10:21.622 HYPERVISOR: exec_cmd: vm set_ghost_file Ghost C3640-JK.BIN-192.ghost 
-May 25 11:10:21.622 HYPERVISOR: exec_cmd: vm set_ram Ghost 192 
-May 25 11:10:21.623 HYPERVISOR: exec_cmd: vm get_status Ghost 
-May 25 11:10:21.639 HYPERVISOR: exec_cmd: vm start Ghost 
-May 25 11:10:22.701 HYPERVISOR: exec_cmd: vm get_status Ghost 
-May 25 11:10:22.702 HYPERVISOR: exec_cmd: vm stop Ghost 
-May 25 11:10:23.285 VM: VM Ghost shutdown.
-May 25 11:10:23.286 HYPERVISOR: exec_cmd: vm clean_delete Ghost 
-May 25 11:10:23.286 VM: VM Ghost destroyed.
-May 25 11:10:23.292 HYPERVISOR: exec_cmd: vm set_ghost_status R2 2 
-May 25 11:10:23.293 HYPERVISOR: exec_cmd: vm set_ghost_file R2 C3640-JK.BIN-192.ghost 
-May 25 11:10:23.597 HYPERVISOR: exec_cmd: nio create_udp udp-1cbef90a-cedd-4656-9b8c-9caff2a71d44 10000 127.0.0.1 10001 
-May 25 11:10:23.633 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 1 udp-1cbef90a-cedd-4656-9b8c-9caff2a71d44 
-May 25 11:10:23.659 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 11:10:23.792 HYPERVISOR: exec_cmd: nio create_udp udp-e4ff7170-563e-422c-a68a-fa3c239dbd39 10003 127.0.0.1 10002 
-May 25 11:10:23.814 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 0 udp-e4ff7170-563e-422c-a68a-fa3c239dbd39 
-May 25 11:10:23.831 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 11:16:21.828 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 11:16:21.830 HYPERVISOR: exec_cmd: vm slot_remove_nio_binding R2 0 0 
-May 25 11:16:21.831 HYPERVISOR: exec_cmd: nio delete udp-e4ff7170-563e-422c-a68a-fa3c239dbd39 
-May 25 11:16:23.119 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 11:16:23.120 HYPERVISOR: exec_cmd: vm slot_remove_nio_binding R2 0 1 
-May 25 11:16:23.121 HYPERVISOR: exec_cmd: nio delete udp-1cbef90a-cedd-4656-9b8c-9caff2a71d44 
-May 25 11:29:08.847 HYPERVISOR: exec_cmd: nio create_udp udp-f2d66340-3129-438c-a514-51e9eec7f59f 10015 127.0.0.1 10014 
-May 25 11:29:08.865 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 0 udp-f2d66340-3129-438c-a514-51e9eec7f59f 
-May 25 11:29:08.865 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 11:29:11.804 HYPERVISOR: exec_cmd: nio create_udp udp-1dbb6c35-39a9-4c32-bbe9-b6c13e8ba8b2 10016 127.0.0.1 10017 
-May 25 11:29:11.823 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 1 udp-1dbb6c35-39a9-4c32-bbe9-b6c13e8ba8b2 
-May 25 11:29:11.823 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 11:42:08.700 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 11:42:09.036 HYPERVISOR: exec_cmd: vm start R2 
-May 25 12:44:38.192 HYPERVISOR: exec_cmd: vm extract_config R2 
-May 25 13:02:00.476 HYPERVISOR: exec_cmd: vm extract_config R2 
-May 25 13:44:27.743 HYPERVISOR: exec_cmd: vm extract_config R2 
-May 25 13:49:50.840 HYPERVISOR: exec_cmd: vm extract_config R2 
-May 25 15:40:15.370 HYPERVISOR: exec_cmd: vm extract_config R2 
-May 25 15:40:19.901 HYPERVISOR: exec_cmd: vm extract_config R2 
-May 25 15:41:47.486 HYPERVISOR: exec_cmd: vm extract_config R2 
-May 25 15:42:19.440 HYPERVISOR: exec_cmd: vm extract_config R2 
-May 25 15:42:21.181 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 15:42:21.182 HYPERVISOR: exec_cmd: vm stop R2 
-May 25 15:42:21.521 VM: VM R2 shutdown.
-May 25 15:42:24.253 HYPERVISOR: exec_cmd: vm get_status R2 
-May 25 15:42:24.262 HYPERVISOR: exec_cmd: vm extract_config R2 
-May 25 15:42:24.272 HYPERVISOR: exec_cmd: vm delete R2 
-May 25 15:42:24.272 VM: VM R2 destroyed.
-May 25 15:42:24.333 HYPERVISOR: exec_cmd: hypervisor stop 
-May 25 15:42:24.733 HYPERVISOR: Stopped.
-May 25 15:42:24.733 GENERAL: reset done.
+Jun 02 19:02:59.399 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
+Jun 02 19:02:59.400 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 2421.
+Jun 02 19:03:00.112 HYPERVISOR: exec_cmd: hypervisor version 
+Jun 02 19:03:00.112 HYPERVISOR: exec_cmd: hypervisor uuid 
+Jun 02 19:03:00.113 HYPERVISOR: exec_cmd: hypervisor working_dir F:\blog\unp\protocol\gns3\demo02\project-files\dynamips 
+Jun 02 19:03:00.113 GENERAL: working_dir=F:\blog\unp\protocol\gns3\demo02\project-files\dynamips
+Jun 02 19:03:00.113 HYPERVISOR: exec_cmd: vm create R2 2 c3600 
+Jun 02 19:03:00.115 VM: VM R2 created.
+Jun 02 19:03:00.116 HYPERVISOR: exec_cmd: vm set_con_tcp_port R2 2002 
+Jun 02 19:03:00.117 HYPERVISOR: exec_cmd: c3600 get_mac_addr R2 
+Jun 02 19:03:00.118 HYPERVISOR: exec_cmd: vm set_ios R2 G:\doc\CCNA\images\IOS\C3640-JK.BIN 
+Jun 02 19:03:00.118 HYPERVISOR: exec_cmd: c3600 set_mac_addr R2 cc02.22e0.0000 
+Jun 02 19:03:00.119 HYPERVISOR: exec_cmd: vm get_status R2 
+Jun 02 19:03:00.119 HYPERVISOR: exec_cmd: vm set_idle_pc R2 0x6046d710 
+Jun 02 19:03:00.120 HYPERVISOR: exec_cmd: vm get_status R2 
+Jun 02 19:03:00.121 HYPERVISOR: exec_cmd: vm slot_add_binding R2 1 0 NM-4T 
+Jun 02 19:03:00.121 HYPERVISOR: exec_cmd: vm set_nvram R2 256 
+Jun 02 19:03:00.122 HYPERVISOR: exec_cmd: vm set_exec_area R2 64 
+Jun 02 19:03:00.124 HYPERVISOR: exec_cmd: vm get_status R2 
+Jun 02 19:03:00.125 HYPERVISOR: exec_cmd: vm slot_add_binding R2 0 0 NM-4E 
+Jun 02 19:03:00.126 HYPERVISOR: exec_cmd: vm set_ram R2 192 
+Jun 02 19:03:00.128 HYPERVISOR: exec_cmd: vm set_config R2 configs/i2_startup-config.cfg 
+Jun 02 19:03:00.575 HYPERVISOR: exec_cmd: vm set_ghost_status R2 2 
+Jun 02 19:03:00.576 HYPERVISOR: exec_cmd: vm set_ghost_file R2 C3640-JK.BIN-192.ghost 
+Jun 02 19:03:01.357 HYPERVISOR: exec_cmd: nio create_udp udp-7585782a-413a-417b-ab2c-fe508a867376 10002 127.0.0.1 10003 
+Jun 02 19:03:01.361 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 1 udp-7585782a-413a-417b-ab2c-fe508a867376 
+Jun 02 19:03:01.386 HYPERVISOR: exec_cmd: vm get_status R2 
+Jun 02 19:03:01.634 HYPERVISOR: exec_cmd: nio create_udp udp-a1814dd5-21ed-4562-bb02-5f8bb5293c76 10007 127.0.0.1 10006 
+Jun 02 19:03:01.636 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 0 udp-a1814dd5-21ed-4562-bb02-5f8bb5293c76 
+Jun 02 19:03:01.665 HYPERVISOR: exec_cmd: vm get_status R2 
+Jun 02 19:03:05.973 HYPERVISOR: exec_cmd: vm get_status R2 
+Jun 02 19:03:05.974 HYPERVISOR: exec_cmd: vm start R2 
+Jun 02 19:16:32.290 HYPERVISOR: exec_cmd: vm extract_config R2 
+Jun 02 19:59:46.669 HYPERVISOR: exec_cmd: vm extract_config R2 
+Jun 02 19:59:49.096 HYPERVISOR: exec_cmd: vm extract_config R2 
+Jun 02 20:10:57.405 HYPERVISOR: exec_cmd: nio bind_filter udp-a1814dd5-21ed-4562-bb02-5f8bb5293c76 2 capture 
+Jun 02 20:10:57.409 HYPERVISOR: exec_cmd: nio setup_filter udp-a1814dd5-21ed-4562-bb02-5f8bb5293c76 2 en10mb F:\blog\unp\protocol\gns3\demo02\project-files\captures\R2_Ethernet0-0_to_R1_Ethernet0-2.pcap 
+Jun 02 20:12:04.485 HYPERVISOR: exec_cmd: nio bind_filter udp-7585782a-413a-417b-ab2c-fe508a867376 2 capture 
+Jun 02 20:12:04.486 HYPERVISOR: exec_cmd: nio setup_filter udp-7585782a-413a-417b-ab2c-fe508a867376 2 en10mb F:\blog\unp\protocol\gns3\demo02\project-files\captures\R2_Ethernet0-1_to_PC4_Ethernet0-0.pcap 
+Jun 02 20:13:15.426 HYPERVISOR: exec_cmd: nio unbind_filter udp-7585782a-413a-417b-ab2c-fe508a867376 2 
+Jun 02 20:13:30.023 HYPERVISOR: exec_cmd: nio unbind_filter udp-a1814dd5-21ed-4562-bb02-5f8bb5293c76 2 
+Jun 02 20:14:10.933 HYPERVISOR: exec_cmd: nio bind_filter udp-a1814dd5-21ed-4562-bb02-5f8bb5293c76 2 capture 
+Jun 02 20:14:10.933 HYPERVISOR: exec_cmd: nio setup_filter udp-a1814dd5-21ed-4562-bb02-5f8bb5293c76 2 en10mb F:\blog\unp\protocol\gns3\demo02\project-files\captures\R2_Ethernet0-0_to_R1_Ethernet0-2.pcap 
+Jun 02 20:14:34.510 HYPERVISOR: exec_cmd: nio bind_filter udp-7585782a-413a-417b-ab2c-fe508a867376 2 capture 
+Jun 02 20:14:34.511 HYPERVISOR: exec_cmd: nio setup_filter udp-7585782a-413a-417b-ab2c-fe508a867376 2 en10mb F:\blog\unp\protocol\gns3\demo02\project-files\captures\R2_Ethernet0-1_to_PC4_Ethernet0-0.pcap 
+Jun 02 20:28:52.485 HYPERVISOR: exec_cmd: vm extract_config R2 
+Jun 02 20:28:54.495 HYPERVISOR: exec_cmd: vm extract_config R2 
+Jun 02 21:21:30.074 HYPERVISOR: exec_cmd: vm get_status R2 
+Jun 02 21:21:30.084 HYPERVISOR: exec_cmd: vm stop R2 
+Jun 02 21:21:30.366 VM: VM R2 shutdown.
+Jun 02 21:21:32.159 HYPERVISOR: exec_cmd: vm get_status R2 
+Jun 02 21:21:32.202 HYPERVISOR: exec_cmd: vm extract_config R2 
+Jun 02 21:21:32.380 HYPERVISOR: exec_cmd: vm delete R2 
+Jun 02 21:21:32.382 VM: VM R2 destroyed.
+Jun 02 21:21:32.401 HYPERVISOR: exec_cmd: hypervisor stop 
+Jun 02 21:21:32.540 HYPERVISOR: Stopped.
+Jun 02 21:21:32.553 GENERAL: reset done.

@@ -1,42 +1,42 @@
-May 23 11:23:07.257 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
-May 23 11:23:07.259 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 11423.
-May 23 11:23:07.578 HYPERVISOR: exec_cmd: hypervisor version 
-May 23 11:23:07.581 HYPERVISOR: exec_cmd: hypervisor uuid 
-May 23 11:23:07.582 HYPERVISOR: exec_cmd: hypervisor working_dir F:/blog/unp/protocol/gns3/demo01\project-files\dynamips 
-May 23 11:23:07.589 GENERAL: working_dir=F:/blog/unp/protocol/gns3/demo01\project-files\dynamips
-May 23 11:23:07.590 HYPERVISOR: exec_cmd: vm create R1 1 c3600 
-May 23 11:23:07.598 VM: VM R1 created.
-May 23 11:23:07.614 HYPERVISOR: exec_cmd: vm set_con_tcp_port R1 2001 
-May 23 11:23:07.614 HYPERVISOR: exec_cmd: c3600 get_mac_addr R1 
-May 23 11:23:07.614 HYPERVISOR: exec_cmd: vm set_ram R1 192 
-May 23 11:23:07.615 HYPERVISOR: exec_cmd: vm set_exec_area R1 64 
-May 23 11:23:07.615 HYPERVISOR: exec_cmd: vm set_nvram R1 256 
-May 23 11:23:07.616 HYPERVISOR: exec_cmd: vm get_status R1 
-May 23 11:23:07.616 HYPERVISOR: exec_cmd: vm slot_add_binding R1 1 0 NM-4T 
-May 23 11:23:07.617 HYPERVISOR: exec_cmd: vm set_ios R1 G:\doc\CCNA\images\IOS\C3640-JK.BIN 
-May 23 11:23:07.618 HYPERVISOR: exec_cmd: c3600 set_mac_addr R1 cc01.16a8.0000 
-May 23 11:23:07.618 HYPERVISOR: exec_cmd: vm get_status R1 
-May 23 11:23:07.619 HYPERVISOR: exec_cmd: vm slot_add_binding R1 0 0 NM-4E 
-May 23 11:23:07.619 HYPERVISOR: exec_cmd: vm get_status R1 
-May 23 11:23:07.620 HYPERVISOR: exec_cmd: vm set_idle_pc R1 0x6046d710 
-May 23 11:23:07.622 HYPERVISOR: exec_cmd: vm set_config R1 configs/i1_startup-config.cfg 
-May 23 11:23:09.111 HYPERVISOR: exec_cmd: vm set_ghost_status R1 2 
-May 23 11:23:09.119 HYPERVISOR: exec_cmd: vm set_ghost_file R1 C3640-JK.BIN-192.ghost 
-May 23 11:23:09.713 HYPERVISOR: exec_cmd: nio create_udp udp-948ad366-fa06-4685-a395-63701ef96eb7 10000 127.0.0.1 10001 
-May 23 11:23:09.762 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 0 1 udp-948ad366-fa06-4685-a395-63701ef96eb7 
-May 23 11:23:09.785 HYPERVISOR: exec_cmd: vm get_status R1 
-May 23 11:23:09.865 HYPERVISOR: exec_cmd: nio create_udp udp-19aaae22-e6a5-4e51-8693-f5cb8e90dafa 10005 127.0.0.1 10004 
-May 23 11:23:09.913 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 0 0 udp-19aaae22-e6a5-4e51-8693-f5cb8e90dafa 
-May 23 11:23:09.985 HYPERVISOR: exec_cmd: vm get_status R1 
-May 23 11:23:19.700 HYPERVISOR: exec_cmd: vm get_status R1 
-May 23 11:23:19.715 HYPERVISOR: exec_cmd: vm start R1 
-May 23 21:18:42.448 HYPERVISOR: exec_cmd: vm get_status R1 
-May 23 21:18:42.453 HYPERVISOR: exec_cmd: vm stop R1 
-May 23 21:18:42.607 VM: VM R1 shutdown.
-May 23 21:18:46.144 HYPERVISOR: exec_cmd: vm get_status R1 
-May 23 21:18:46.146 HYPERVISOR: exec_cmd: vm extract_config R1 
-May 23 21:18:46.266 HYPERVISOR: exec_cmd: vm delete R1 
-May 23 21:18:46.267 VM: VM R1 destroyed.
-May 23 21:18:46.302 HYPERVISOR: exec_cmd: hypervisor stop 
-May 23 21:18:46.365 HYPERVISOR: Stopped.
-May 23 21:18:46.366 GENERAL: reset done.
+May 25 18:48:23.805 HYPERVISOR: Release 0.2.14-x86/Windows (tag 2014092320)
+May 25 18:48:23.806 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 27098.
+May 25 18:48:23.892 HYPERVISOR: exec_cmd: hypervisor version 
+May 25 18:48:23.893 HYPERVISOR: exec_cmd: hypervisor uuid 
+May 25 18:48:23.896 HYPERVISOR: exec_cmd: hypervisor working_dir F:\blog\unp\protocol\gns3\demo01\project-files\dynamips 
+May 25 18:48:23.896 GENERAL: working_dir=F:\blog\unp\protocol\gns3\demo01\project-files\dynamips
+May 25 18:48:23.899 HYPERVISOR: exec_cmd: vm create PC3 5 c3600 
+May 25 18:48:23.901 VM: VM PC3 created.
+May 25 18:48:23.902 HYPERVISOR: exec_cmd: vm set_con_tcp_port PC3 2003 
+May 25 18:48:23.902 HYPERVISOR: exec_cmd: c3600 get_mac_addr PC3 
+May 25 18:48:23.903 HYPERVISOR: exec_cmd: c3600 set_mac_addr PC3 cc05.0d78.0000 
+May 25 18:48:23.905 HYPERVISOR: exec_cmd: vm set_exec_area PC3 64 
+May 25 18:48:23.906 HYPERVISOR: exec_cmd: vm set_ram PC3 192 
+May 25 18:48:23.908 HYPERVISOR: exec_cmd: vm set_ios PC3 G:\doc\CCNA\images\IOS\C3640-JK.BIN 
+May 25 18:48:23.910 HYPERVISOR: exec_cmd: vm get_status PC3 
+May 25 18:48:23.911 HYPERVISOR: exec_cmd: vm slot_add_binding PC3 0 0 NM-4E 
+May 25 18:48:23.912 HYPERVISOR: exec_cmd: vm set_nvram PC3 256 
+May 25 18:48:23.913 HYPERVISOR: exec_cmd: vm get_status PC3 
+May 25 18:48:23.914 HYPERVISOR: exec_cmd: vm slot_add_binding PC3 1 0 NM-4T 
+May 25 18:48:23.916 HYPERVISOR: exec_cmd: vm get_status PC3 
+May 25 18:48:23.916 HYPERVISOR: exec_cmd: vm set_idle_pc PC3 0x6046d710 
+May 25 18:48:23.920 HYPERVISOR: exec_cmd: vm set_config PC3 configs/i5_startup-config.cfg 
+May 25 18:48:25.302 HYPERVISOR: exec_cmd: vm set_ghost_status PC3 2 
+May 25 18:48:25.303 HYPERVISOR: exec_cmd: vm set_ghost_file PC3 C3640-JK.BIN-192.ghost 
+May 25 18:48:25.735 HYPERVISOR: exec_cmd: nio create_udp udp-d7b335e4-b308-4e3c-b522-d7e417a5d8aa 10005 127.0.0.1 10004 
+May 25 18:48:25.744 HYPERVISOR: exec_cmd: vm slot_add_nio_binding PC3 0 0 udp-d7b335e4-b308-4e3c-b522-d7e417a5d8aa 
+May 25 18:48:25.766 HYPERVISOR: exec_cmd: vm get_status PC3 
+May 25 18:48:42.275 HYPERVISOR: exec_cmd: vm get_status PC3 
+May 25 18:48:42.287 HYPERVISOR: exec_cmd: vm start PC3 
+May 25 18:52:33.362 HYPERVISOR: exec_cmd: nio bind_filter udp-d7b335e4-b308-4e3c-b522-d7e417a5d8aa 2 capture 
+May 25 18:52:33.363 HYPERVISOR: exec_cmd: nio setup_filter udp-d7b335e4-b308-4e3c-b522-d7e417a5d8aa 2 en10mb F:\blog\unp\protocol\gns3\demo01\project-files\captures\PC3_Ethernet0-0_to_R2_Ethernet0-1.pcap 
+May 25 20:27:07.025 HYPERVISOR: exec_cmd: vm get_status PC3 
+May 25 20:27:07.062 HYPERVISOR: exec_cmd: vm stop PC3 
+May 25 20:27:07.595 VM: VM PC3 shutdown.
+May 25 20:27:12.414 HYPERVISOR: exec_cmd: vm extract_config PC3 
+May 25 20:27:12.586 HYPERVISOR: exec_cmd: vm get_status PC3 
+May 25 20:27:12.602 HYPERVISOR: exec_cmd: vm extract_config PC3 
+May 25 20:27:12.608 HYPERVISOR: exec_cmd: vm delete PC3 
+May 25 20:27:12.609 VM: VM PC3 destroyed.
+May 25 20:27:12.611 HYPERVISOR: exec_cmd: hypervisor stop 
+May 25 20:27:13.017 HYPERVISOR: Stopped.
+May 25 20:27:13.017 GENERAL: reset done.
