@@ -12,6 +12,8 @@ struct Options {
 	int port;
 } g_option;
 
+void handler(int sig);
+
 int main(int argc, char* argv[]) {
 	Args args = parsecmdline(argc, argv);
 	if (args.empty()){
@@ -24,6 +26,7 @@ int main(int argc, char* argv[]) {
 	SETSTR(args, g_option.hostname, "h", "0");
 	SETSTR(args, g_option.multiAddr, "g", "230.2.2.2");
 	SETINT(args, g_option.port, "p", 8000);
+	registSignal(SIGALRM, handler);
 
 	if (g_option.isServer) {
 		server_routine();
@@ -67,7 +70,8 @@ void server_routine() {
 }
 
 void client_routine() {
-	int sockfd;
+	int sockfd, ret;
+	unsigned char ttl;
 
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sockfd < 0) ERR_EXIT("socket");
@@ -119,17 +123,22 @@ void doClient(int sockfd) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("sendto");
 		}
-		addrlen = sizeof(cliaddr);
-		nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&cliaddr, &addrlen); 
-		if (nr < 0) {
-			if (errno == EINTR) continue;
-			ERR_EXIT("recvfrom");
-		}
-		LOG("from %s:%d ", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
-		nw = iwrite(STDOUT_FILENO, buf, nr);
-		if (nr < 0) {
-			ERR_EXIT("iwrite");
+		alarm(2);
+		for (;;) {
+			addrlen = sizeof(cliaddr);
+			nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&cliaddr, &addrlen); 
+			if (nr < 0) {
+				if (errno == EINTR) break;
+				ERR_EXIT("recvfrom");
+			}
+			LOG("from %s:%d ", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+			nw = iwrite(STDOUT_FILENO, buf, nr);
+			if (nr < 0) {
+				ERR_EXIT("iwrite");
+			}
 		}
 	}
 }
 
+void handler(int sig) {
+}
