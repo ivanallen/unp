@@ -16,6 +16,7 @@
 #include <poll.h>
 #include <limits.h>
 #include <netinet/tcp.h>
+#include <net/if.h>
 #include <signal.h>
 #include <assert.h>
 #include <sys/epoll.h>
@@ -109,6 +110,8 @@ void printData(const unsigned char* data, int len, int cols = 16);
 int printIp(const struct ip *ip, int len);
 void printIcmp(struct icmp* icmp, int len);
 unsigned short cksum(unsigned short *addr, int len);
+int recvFromFlags(int sockfd, char* buf, int len, int *flags, 
+		struct sockaddr *addr, socklen_t *addrlen, struct in_pktinfo *pkt);
 
 
 

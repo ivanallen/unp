@@ -674,3 +674,61 @@ unsigned short cksum(unsigned short *addr, int len){
 
 	return (unsigned short) ~sum;
 }
+
+int recvFromFlags(int sockfd, char* buf, int len, int *flags, 
+		struct sockaddr *addr, socklen_t *addrlen, struct in_pktinfo *pkt) {
+	int nr;
+	struct msghdr msg;
+	struct cmsghdr *cmsg;
+	struct sockaddr_dl *sdl; // 数据链路层地址
+	struct iovec iov[1];
+	union {
+		struct cmsghdr cm;
+		char control[CMSG_SPACE(sizeof(struct in_pktinfo))];
+	}control_un;
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = len;
+
+	msg.msg_name = addr;
+	msg.msg_namelen = *addrlen;
+	msg.msg_iov = iov;
+	msg.msg_iovlen = 1;
+	msg.msg_control = control_un.control;
+	msg.msg_controllen = sizeof(control_un.control);
+	msg.msg_flags = 0;
+
+	nr = recvmsg(sockfd, &msg, *flags);
+	if (nr < 0) {
+#ifdef DEBUG
+		ERR_PRINT("[%s:%d] recvmsg: %s\n", __FILE__, __LINE__, strerror(errno));
+#endif
+		return nr;
+	}
+
+	// 返回的标志位
+	*flags = msg.msg_flags;
+
+	if (msg.msg_controllen < sizeof(struct cmsghdr) // 辅助数据长度不够
+			|| (msg.msg_flags & MSG_CTRUNC) // 辅助数据被截断
+			|| pkt == NULL) { // 用户并不想知道接口信息
+		return nr;
+	}
+
+	// 遍历辅助数据
+	// Linux 采用 IP_PKTINFO 而不是 IP_RECVDSTADDR 和 IP_RECVIF 
+	// 该套接字选项对应结构体 struct in_pktinfo
+	// 成员 ipi_ifindex 表示数据包从哪个接口进来的
+	// 成员 ipi_spec_dst 表示数据包的本地地址
+	// 成员 ipi_addr 表示数据包的目的地址
+	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
+		if (cmsg->cmsg_level == IPPROTO_IP && cmsg->cmsg_type == IP_PKTINFO) {
+			memcpy(pkt, CMSG_DATA(cmsg), sizeof(struct in_pktinfo));
+			break;
+		}
+		
+		ERR_QUIT("unknown ancillary data, len = %d, level = %d, type = %d",
+				cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);
+	}
+	return nr;
+}
