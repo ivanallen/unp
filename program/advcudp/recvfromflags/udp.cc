@@ -78,13 +78,16 @@ void doServer(int sockfd) {
   while(1) {
 		len = sizeof(cliaddr);
 		flags = 0;
+		bzero(&pkt, sizeof(pkt));
 		nr = recvFromFlags(sockfd, buf, 20, &flags, (struct sockaddr*)&cliaddr, &len, &pkt);
 		if (nr < 0) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("recvFromFlags");
 		}
-		puts("...");
 		printf("%d byte datagram from %s", nr, inet_ntoa(cliaddr.sin_addr));
+		if (pkt.ipi_spec_dst.s_addr != 0) {
+			printf("(sender's ip %s)", inet_ntoa(pkt.ipi_spec_dst));
+		}
 		if (pkt.ipi_addr.s_addr != 0) {
 			printf(", to %s", inet_ntoa(pkt.ipi_addr));
 		}
@@ -121,8 +124,9 @@ void doServer(int sockfd) {
 
 void doClient(int sockfd) {
 	int ret, len, nr, nw;
-	struct sockaddr_in servaddr;
+	struct sockaddr_in servaddr, recvaddr;
 	char buf[4096];
+	socklen_t addrlen;
 
 	ret = resolve(g_option.hostname, g_option.port, &servaddr);
 	if (ret < 0) ERR_EXIT("resolve");
@@ -138,11 +142,14 @@ void doClient(int sockfd) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("sendto");
 		}
-		nr = recvfrom(sockfd, buf, 4096, 0, NULL, NULL); 
+		addrlen = sizeof(recvaddr);
+		nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&recvaddr, &addrlen); 
 		if (nr < 0) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("recvfrom");
 		}
+
+		LOG("from %s: ", inet_ntoa(recvaddr.sin_addr));
 		nw = iwrite(STDOUT_FILENO, buf, nr);
 		if (nr < 0) {
 			ERR_EXIT("iwrite");

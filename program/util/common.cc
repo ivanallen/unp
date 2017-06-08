@@ -701,7 +701,7 @@ int recvFromFlags(int sockfd, char* buf, int len, int *flags,
 	nr = recvmsg(sockfd, &msg, *flags);
 	if (nr < 0) {
 #ifdef DEBUG
-		ERR_PRINT("[%s:%d] recvmsg: %s\n", __FILE__, __LINE__, strerror(errno));
+		ERR_EXIT("recvmsg");
 #endif
 		return nr;
 	}
