@@ -10,14 +10,14 @@
 } while(0)
 
 #define ERR_EXIT(msg) do { \
-	fprintf(stderr, "\x1b[K\x1b[31m[%s:%d]", __FILE__, __LINE__); \
+	fprintf(stderr, "\x1b[K\x1b[31m[%s:%d] ", __FILE__, __LINE__); \
 	perror(msg); \
 	fprintf(stderr, "\x1b[0m");\
 	exit(1); \
 } while(0)
 
 #define ERR_QUIT(format,...) do { \
-	fprintf(stderr, "\x1b[K\x1b[31m[%s:%d]", __FILE__, __LINE__); \
+	fprintf(stderr, "\x1b[K\x1b[31m[%s:%d] ", __FILE__, __LINE__); \
 	fprintf(stderr, format, ##__VA_ARGS__); \
 	fprintf(stderr, "\x1b[0m");\
 	exit(1); } \

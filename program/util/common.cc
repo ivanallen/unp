@@ -732,3 +732,160 @@ int recvFromFlags(int sockfd, char* buf, int len, int *flags,
 	}
 	return nr;
 }
+
+int getIfConf(struct ifreq** ifr) {
+	int len, lastlen, sockfd, ret;
+	char *buf;
+	struct ifconf ifc;
+
+	if (ifr == NULL) return -1;
+
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (sockfd < 0) ERR_EXIT("socket");
+	len = sizeof(struct ifreq);
+
+	// 如果缓冲区大小不够，ioctl 也会成功返回 
+	// 所以这里只能采用倍增法试探合适的大小
+	while(1) {
+		buf = (char*)malloc(len);
+		ifc.ifc_buf = buf;
+		ifc.ifc_len = len; // 值-结果参数
+
+		// 试探性请求
+		ret = ioctl(sockfd, SIOCGIFCONF, &ifc);
+		if (ret < 0) {
+#ifdef DEBUG
+			ERR_EXIT("ioctl");
+#endif
+			return -1;
+		}
+		else {
+			if (ifc.ifc_len < len) {
+				// 说明缓冲区够了 
+#ifdef DEBUG
+				LOG("buf insufficient, buflen = %d, ifc_len = %d\n", 
+						len, ifc.ifc_len);
+#endif
+				break;
+			}
+		}
+
+#ifdef DEBUG
+		LOG("buf insufficient, buflen = %d, ifc_len = %d\n", 
+				len, ifc.ifc_len);
+#endif
+
+		// 没有成功，说明内存不够，将长度翻倍
+		len <<= 1;
+		free(buf);
+	}
+
+
+	*ifr = (struct ifreq*)buf;
+	return ifc.ifc_len/sizeof(struct ifreq);
+}
+
+void freeIfConf(struct ifreq *ifr) {
+	free(ifr);
+}
+
+int getIfiInfo(struct ifi_info **ifi) {
+
+	int count, ret, sockfd, i, k, myflags, flags;
+	struct ifi_info *_ifi;
+	struct ifreq *ifr, ifrcopy;
+	struct sockaddr_in *sa;
+
+	if (ifi == NULL) return -1;
+
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (sockfd < 0) ERR_EXIT("socket");
+
+	count = getIfConf(&ifr);
+	if (count < 0) ERR_EXIT("getIfConf");
+
+	_ifi = (struct ifi_info*)malloc(count*sizeof(struct ifi_info));
+	bzero(_ifi, count*sizeof(struct ifi_info));
+
+	k = 0;
+	for(i = 0; i < count; ++i) {
+		// 复制一份 ifr
+		ifrcopy = ifr[i];
+
+		// 1. 填充 ifi_name
+		myflags = 0;
+		memcpy(_ifi[k].ifi_name, ifr[i].ifr_name, IFI_NAMESIZE);
+
+		// 2. 填充 ifi_index
+		_ifi[k].ifi_index = if_nametoindex(ifr[i].ifr_name);
+
+		// 3. 填充 mtu
+		ret = ioctl(sockfd, SIOCGIFMTU, &ifrcopy);
+		if (ret < 0) ERR_EXIT("ioctl");
+		_ifi[k].ifi_mtu = ifrcopy.ifr_mtu;
+
+		// 4. 填充 ifi_haddr, ifi_hlen
+		ret = ioctl(sockfd, SIOCGIFHWADDR, &ifrcopy);
+		if (ret < 0) ERR_EXIT("ioctl");
+		memcpy(_ifi[k].ifi_haddr, ((struct sockaddr*)&ifrcopy.ifr_hwaddr)->sa_data, 6);
+		_ifi[k].ifi_hlen = 6;
+
+		// 5. 填充 ifi_flags
+		ret = ioctl(sockfd, SIOCGIFFLAGS, &ifrcopy);
+		if (ret < 0) ERR_EXIT("ioctl");
+		flags = ifrcopy.ifr_flags;
+		_ifi[k].ifi_flags = flags;
+
+		// 6. 填充 ifi_myflags 
+		// 暂时不管
+		_ifi[k].ifi_myflags = 0;
+		
+		// 7. 填充 ifi_addr 
+		sa = (struct sockaddr_in*)&ifr[i].ifr_addr;
+		_ifi[k].ifi_addr = (struct sockaddr*)malloc(sizeof(sockaddr_in));
+		memcpy(_ifi[k].ifi_addr, sa, sizeof(sockaddr_in));
+
+		// 8. 填充 ifi_netmask
+		ret = ioctl(sockfd, SIOCGIFNETMASK, &ifrcopy);
+		if (ret < 0) ERR_EXIT("ioctl");
+		sa = (struct sockaddr_in*)&ifrcopy.ifr_netmask;
+		_ifi[k].ifi_netmask = (struct sockaddr*)malloc(sizeof(sockaddr_in));
+		memcpy(_ifi[k].ifi_netmask, sa, sizeof(sockaddr_in));
+
+		// 9. 填充 ifi_brdaddr, 只有支持 broadcast 的接口才有
+		if (flags & IFF_BROADCAST) {
+			ret = ioctl(sockfd, SIOCGIFBRDADDR, &ifrcopy);
+			if (ret < 0) ERR_EXIT("ioctl");
+			sa = (struct sockaddr_in*)&ifrcopy.ifr_addr;
+			_ifi[k].ifi_brdaddr = (struct sockaddr*)malloc(sizeof(sockaddr_in));
+			memcpy(_ifi[k].ifi_brdaddr, sa, sizeof(sockaddr_in));
+		}
+
+		// 10. 填充 ifi_dstaddr, 只有是 P2P 的时候才有效
+		if (flags & IFF_POINTOPOINT) {
+			ret = ioctl(sockfd, SIOCGIFDSTADDR, &ifrcopy);
+			if (ret < 0) ERR_EXIT("ioctl");
+			sa = (struct sockaddr_in*)&ifrcopy.ifr_dstaddr;
+			_ifi[k].ifi_dstaddr = (struct sockaddr*)malloc(sizeof(sockaddr_in));
+			memcpy(_ifi[k].ifi_dstaddr, sa, sizeof(sockaddr_in));
+		}
+
+		++k;
+	}
+
+	freeIfConf(ifr);
+
+	*ifi = _ifi;
+	return k;
+}
+
+void freeIfiInfo(struct ifi_info* ifi, int n) {
+	int i;
+	for (i = 0; i < n; ++i) {
+		free(ifi[i].ifi_addr);
+		free(ifi[i].ifi_netmask);
+		free(ifi[i].ifi_brdaddr);
+		free(ifi[i].ifi_dstaddr);
+	}
+	free(ifi);
+}

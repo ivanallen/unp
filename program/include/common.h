@@ -19,6 +19,7 @@
 #include <net/if.h>
 #include <signal.h>
 #include <assert.h>
+#include <sys/ioctl.h>
 #include <sys/epoll.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -70,6 +71,23 @@
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
+#define IFI_NAMESIZE IF_NAMESIZE
+#define IFI_HADDRSIZE 8
+
+struct ifi_info {
+	char ifi_name[IFI_NAMESIZE]; // 接口名称 16 字节
+	short ifi_index; // 接口索引
+	short ifi_mtu; // 接口 MTU
+	unsigned char ifi_haddr[IFI_HADDRSIZE]; // 物理地址 8 字节
+	unsigned short ifi_hlen; // 物理地址长度
+	short ifi_flags;
+	short ifi_myflags;
+	struct sockaddr *ifi_addr; // 主地址
+	struct sockaddr *ifi_netmask; // 子网掩码
+	struct sockaddr *ifi_brdaddr; // 广播地址
+	struct sockaddr *ifi_dstaddr; // 目标地址
+};
+
 typedef std::map<std::string, std::string> Args;
 
 
@@ -112,6 +130,10 @@ void printIcmp(struct icmp* icmp, int len);
 unsigned short cksum(unsigned short *addr, int len);
 int recvFromFlags(int sockfd, char* buf, int len, int *flags, 
 		struct sockaddr *addr, socklen_t *addrlen, struct in_pktinfo *pkt);
+int getIfConf(struct ifreq **ifr);
+void freeIfConf(struct ifreq *ifr);
+int getIfiInfo(struct ifi_info **ifi);
+void freeIfiInfo(struct ifi_info* ifi, int n);
 
 
 
