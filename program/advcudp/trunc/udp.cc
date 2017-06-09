@@ -64,21 +64,38 @@ void client_routine() {
 }
 
 void doServer(int sockfd) {
-	char buf[4096];
+	char buf[20];
 	int nr, nw;
 	struct sockaddr_in cliaddr;
 	socklen_t len;
+	struct msghdr msg;
+	struct iovec iov[1];
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = 20;
+	
+	msg.msg_name = &cliaddr;
+	msg.msg_iov = iov;
+	msg.msg_iovlen = 1;
+	msg.msg_control = NULL;
+	msg.msg_controllen = 0;
+	msg.msg_flags = 0;
 
   while(1) {
-		len = sizeof(cliaddr);
-		nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&cliaddr, &len); 
+		msg.msg_namelen = sizeof(cliaddr);
+		nr = recvmsg(sockfd, &msg, 0);
 		if (nr < 0) {
 			if (errno == EINTR) continue;
-			ERR_EXIT("recvfrom");
+			ERR_EXIT("recvmsg");
 		}
-		LOG("from %s:\n", inet_ntoa(cliaddr.sin_addr));
-		iwrite(STDOUT_FILENO, buf, nr);
-	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&cliaddr, len);	
+
+		printf("from %s", inet_ntoa(cliaddr.sin_addr));
+		if (msg.msg_flags & MSG_TRUNC) 
+			printf(" (datagram truncated)");
+
+		puts("");
+
+	  nw = sendto(sockfd, buf, nr, 0, (struct sockaddr*)&cliaddr, sizeof(cliaddr));	
 		if (nw < 0) {
 			if (errno == EINTR) continue;
 			ERR_EXIT("sentdo");

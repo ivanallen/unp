@@ -81,7 +81,6 @@ struct ifi_info {
 	unsigned char ifi_haddr[IFI_HADDRSIZE]; // 物理地址 8 字节
 	unsigned short ifi_hlen; // 物理地址长度
 	short ifi_flags;
-	short ifi_myflags;
 	struct sockaddr *ifi_addr; // 主地址
 	struct sockaddr *ifi_netmask; // 子网掩码
 	struct sockaddr *ifi_brdaddr; // 广播地址

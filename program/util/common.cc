@@ -680,7 +680,7 @@ int recvFromFlags(int sockfd, char* buf, int len, int *flags,
 	int nr;
 	struct msghdr msg;
 	struct cmsghdr *cmsg;
-	struct sockaddr_dl *sdl; // 数据链路层地址
+	// struct sockaddr_dl *sdl; // 数据链路层地址
 	struct iovec iov[1];
 	union {
 		struct cmsghdr cm;
@@ -719,7 +719,7 @@ int recvFromFlags(int sockfd, char* buf, int len, int *flags,
 	// Linux 采用 IP_PKTINFO 而不是 IP_RECVDSTADDR 和 IP_RECVIF 
 	// 该套接字选项对应结构体 struct in_pktinfo
 	// 成员 ipi_ifindex 表示数据包从哪个接口进来的
-	// 成员 ipi_spec_dst 表示数据包的本地地址
+	// 成员 ipi_spec_dst 表示数据包的本地地址（路由地址）
 	// 成员 ipi_addr 表示数据包的目的地址
 	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
 		if (cmsg->cmsg_level == IPPROTO_IP && cmsg->cmsg_type == IP_PKTINFO) {
@@ -838,7 +838,7 @@ int getIfiInfo(struct ifi_info **ifi) {
 
 		// 6. 填充 ifi_myflags 
 		// 暂时不管
-		_ifi[k].ifi_myflags = 0;
+		// _ifi[k].ifi_myflags = 0;
 		
 		// 7. 填充 ifi_addr 
 		sa = (struct sockaddr_in*)&ifr[i].ifr_addr;
