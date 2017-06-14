@@ -84,7 +84,7 @@ void doServer(int sockfd) {
 		data = buf + sizeof(struct echo_head);
 
 		// 随机丢弃
-		if (rand() % 100 < 70) {
+		if (rand() % 100 < 50) {
 			WARNING("discard from %s(seq = %d, timestamp = %d):\n", inet_ntoa(cliaddr.sin_addr),
 				hdr->seq, hdr->ts);
 			continue;
