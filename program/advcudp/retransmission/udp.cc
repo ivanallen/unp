@@ -83,6 +83,13 @@ void doServer(int sockfd) {
 		hdr = (struct echo_head*)buf;
 		data = buf + sizeof(struct echo_head);
 
+		// 随机丢弃
+		if (rand() % 100 < 70) {
+			WARNING("discard from %s(seq = %d, timestamp = %d):\n", inet_ntoa(cliaddr.sin_addr),
+				hdr->seq, hdr->ts);
+			continue;
+		}
+
 		LOG("from %s(seq = %d, timestamp = %d):\n", inet_ntoa(cliaddr.sin_addr),
 				hdr->seq, hdr->ts);
 		iwrite(STDOUT_FILENO, data, nr - sizeof(struct echo_head));

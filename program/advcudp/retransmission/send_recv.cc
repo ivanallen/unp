@@ -75,7 +75,7 @@ sendagain:
 	nw = sendmsg(sockfd, &msgsend, 0);
 	if (nw < 0) ERR_EXIT("sendmsg");
 
-	alarm(3); // 设置超时时间
+	alarm(1); // 设置超时时间
 	do {
 		FD_SET(sockfd, &rfds);
 		ret = pselect(maxfd + 1, &rfds, NULL, NULL, NULL, &emptyset);
@@ -84,7 +84,7 @@ sendagain:
 			if (errno == EINTR) {
 				++rtt_count;
 				// 重传三次不成功宣告失败。
-				if (rtt_count < 3) {
+				if (rtt_count < 5) {
 					WARNING("send again: ");
 					goto sendagain;
 				}
@@ -110,5 +110,4 @@ sendagain:
 
 
 void handler(int sig) {
-	LOG("receive signal: %d\n", sig);
 }

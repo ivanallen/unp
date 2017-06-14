@@ -85,11 +85,11 @@ void doServer(int sockfd) {
 			ERR_EXIT("recvFromFlags");
 		}
 		printf("%d byte datagram from %s", nr, inet_ntoa(cliaddr.sin_addr));
-		if (pkt.ipi_spec_dst.s_addr != 0) {
-			printf("(sender's ip %s)", inet_ntoa(pkt.ipi_spec_dst));
-		}
 		if (pkt.ipi_addr.s_addr != 0) {
 			printf(", to %s", inet_ntoa(pkt.ipi_addr));
+		}
+		if (pkt.ipi_spec_dst.s_addr != 0) {
+			printf("(local ip %s)", inet_ntoa(pkt.ipi_spec_dst));
 		}
 		if (pkt.ipi_ifindex > 0) {
 			printf(", recv i/f = %s", if_indextoname(pkt.ipi_ifindex, ifname));
