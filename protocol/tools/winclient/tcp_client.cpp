@@ -63,8 +63,8 @@ int main(int argc, char* argv[])
 
 	while (1) {
 		scanf("%s", sendBuf);
-		send(sockClient, sendBuf, strlen(sendBuf) + 1, 0); //向服务器端发送数据
 		if (sendBuf[0] == 'q') break;
+		send(sockClient, sendBuf, strlen(sendBuf) + 1, 0); //向服务器端发送数据
 		n = recv(sockClient, recvBuf, 64, 0); //接收服务器端数据
 		if (n < 0) {
 			printf("read error, %d\n", WSAGetLastError());
