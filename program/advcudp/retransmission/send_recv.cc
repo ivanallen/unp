@@ -84,7 +84,7 @@ sendagain:
 			if (errno == EINTR) {
 				++rtt_count;
 				// 重传三次不成功宣告失败。
-				if (rtt_count < 5) {
+				if (rtt_count < 3) {
 					WARNING("send again: ");
 					goto sendagain;
 				}
