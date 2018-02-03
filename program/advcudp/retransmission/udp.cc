@@ -123,6 +123,7 @@ void doClient(int sockfd) {
             ERR_EXIT("send_recv");
         }
 
+				iwrite(STDOUT_FILENO, "recv:", strlen("recv:"));
         nw = iwrite(STDOUT_FILENO, inbuf, nr);
         if (nr < 0) {
             ERR_EXIT("iwrite");
