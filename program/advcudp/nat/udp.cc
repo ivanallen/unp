@@ -167,7 +167,11 @@ void beat(int sockfd, struct sockaddr_in *servaddr) {
 
     count = nr / 16; // 总条数
 
-    printf("设备列表(%d):\n", count);
+    if (count > 0)
+        printf("设备列表(%d):\n", count);
+    else 
+        printf("暂无设备信息\n");
+
     for (i = 0; i < count; ++i) {
         LOG("[%02d]:%s:%d\n", i, inet_ntoa(addrs[i].sin_addr),
             ntohs(addrs[i].sin_port));
@@ -191,15 +195,20 @@ void beat(int sockfd, struct sockaddr_in *servaddr) {
 }
 
 void doClient(int sockfd) {
-    int ret, nr, nw;
+    int ret, nr, nw, status;
     socklen_t len;
-    struct sockaddr_in servaddr;
-    struct sockaddr_in peeraddr;
+    struct sockaddr_in servaddr; // 服务端地址
+    struct sockaddr_in peeraddr; // 不知道谁发来的，可能是服务器，也可能是其它 client
+    struct sockaddr_in addr;     // 保存打洞成功的地址
     char buf[4096];
 
     ret = resolve(g_option.hostname, g_option.port, &servaddr);
 
     beat(sockfd, &servaddr);
+
+    // 0: 打洞准备阶段
+    // 1: 打洞成功
+    status = 0;
 
 
     while(1) {
@@ -209,11 +218,12 @@ void doClient(int sockfd) {
             inet_ntoa(peeraddr.sin_addr), ntohs(peeraddr.sin_port), buf);
 
         if (!strcmp("feedback", buf)) {
-            struct sockaddr_in *addr = (struct sockaddr_in*)(buf + 12);
+            addr = *(struct sockaddr_in*)(buf + 12);
             LOG("say hello to %s:%d\n",
-                inet_ntoa(addr->sin_addr), ntohs(addr->sin_port));
+                inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
             sendto(sockfd, "Hello friend!", strlen("Hello friend!") + 1,
-                0, (struct sockaddr*)addr, sizeof(sockaddr_in));
+                0, (struct sockaddr*)&addr, sizeof(sockaddr_in));
+            status = 1;
         }
 
         if (!strcmp("probe", buf)) {
@@ -221,6 +231,13 @@ void doClient(int sockfd) {
             sendto(sockfd, "Hello friend!", strlen("Hello friend!") + 1,
                 0, (struct sockaddr*)&peeraddr, sizeof(sockaddr_in));
              */
+        }
+
+
+        // 被打通的这一端将可以主动发信息给请求者，而不经过服务器。
+        if (status) {
+            nr = iread(STDIN_FILENO, buf, 4096);
+            sendto(sockfd, buf, nr + 1, 0, (struct sockaddr*)&addr, sizeof(sockaddr_in));
         }
     }
 }
