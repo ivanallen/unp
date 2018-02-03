@@ -175,7 +175,7 @@ void beat(int sockfd, struct sockaddr_in *servaddr) {
         printf("暂无设备信息\n");
 
     for (i = 0; i < count; ++i) {
-        LOG("[%02d]:%s:%d\n", i, inet_ntoa(addrs[i].sin_addr),
+        LOG("[%02d] %s:%d\n", i, inet_ntoa(addrs[i].sin_addr),
             ntohs(addrs[i].sin_port));
     }
 
@@ -186,7 +186,8 @@ void beat(int sockfd, struct sockaddr_in *servaddr) {
         printf("ok! 你选择了第 %d 个设备\n", index);
         strcpy(buf, "probe");
         // 发送探测包
-        LOG("正确激活通道... %s:%d -> %s:%d\n",
+        LOG("正确激活通道...");
+        printf("%s:%d -> %s:%d\n",
             inet_ntoa(thisAddr.sin_addr), ntohs(thisAddr.sin_port),
             inet_ntoa(addrs[index].sin_addr), ntohs(addrs[index].sin_port));
         sendto(sockfd, buf, 64, 0, (struct sockaddr*)&addrs[index], sizeof(sockaddr_in));
@@ -231,13 +232,6 @@ void doClient(int sockfd) {
                 sendto(sockfd, "Hello friend!", strlen("Hello friend!") + 1,
                     0, (struct sockaddr*)&addr, sizeof(sockaddr_in));
                 status = 1;
-            }
-
-            if (!strcmp("probe", buf)) {
-                /*
-                sendto(sockfd, "Hello friend!", strlen("Hello friend!") + 1,
-                    0, (struct sockaddr*)&peeraddr, sizeof(sockaddr_in));
-                 */
             }
         }
 
