@@ -66,14 +66,15 @@ void client_routine() {
 }
 
 int accept(int sockfd) {
-    char buf[4096];
+    char buf[16];
     int nr, nw, newSockfd, ret;
     struct sockaddr_in cliaddr;
+    struct sockaddr_in servaddr;
     pid_t pid;
     socklen_t len;
     // 第一次接受客户端发来的数据
     len = sizeof(sockaddr_in);
-    nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&cliaddr, &len);
+    nr = recvfrom(sockfd, buf, 16, 0, (struct sockaddr*)&cliaddr, &len);
     if (nr < 0) ERR_EXIT("recvfrom");
     buf[nr] = 0;  
     LOG("accept client:%s:%d %s\n",
@@ -82,7 +83,14 @@ int accept(int sockfd) {
     newSockfd = socket(AF_INET, SOCK_DGRAM, 0);
     ret = connect(newSockfd, (struct sockaddr*)&cliaddr, len);
     if (ret < 0) ERR_EXIT("connect");
-    nw = iwrite(newSockfd, "Hello client", 12);
+    // 取得本地绑定地址
+    ret = getsockname(newSockfd, (struct sockaddr*)&servaddr, &len);
+    LOG("new addr:%s:%d\n",
+        inet_ntoa(servaddr.sin_addr), ntohs(servaddr.sin_port));
+    sprintf(buf, "Hello client");
+    *(unsigned short*)(buf + 14) = ntohs(servaddr.sin_port);
+    // buf = {"Hello client", port}
+    nw = sendto(sockfd, buf, 16, 0, (struct sockaddr*)&cliaddr, len);
     return newSockfd;
 }
 
@@ -122,7 +130,7 @@ void doServer(int sockfd) {
 
 // 握手
 int build(int sockfd) {
-    int ret, nr, nw;
+    int ret, nr, nw, port;
     socklen_t len;
     struct sockaddr_in servaddr;
     char buf[16] = "Hello server"; // 12 byte
@@ -133,14 +141,19 @@ int build(int sockfd) {
     len = sizeof(servaddr);
     nr = recvfrom(sockfd, buf, 16, 0, (struct sockaddr*)&servaddr, &len);
     if (nr < 0) ERR_EXIT("recvfrom");
+    buf[12] = 0;
     if (strcmp(buf, "Hello client") != 0) {
         buf[nr] = 0;
         ERR_PRINT("recv:%s, build connection faild!\n", buf);
         exit(0);
     }
+    // 提取服务端新地址
+    port = *(unsigned short*)(buf + 14);
     LOG("recv from %s:%d:%s, build connection success!\n", 
         inet_ntoa(servaddr.sin_addr), ntohs(servaddr.sin_port), buf);
     // setpeeraddr
+    servaddr.sin_port = htons(port);
+    LOG("new port:%d\n", port);
     ret = connect(sockfd, (struct sockaddr*)&servaddr, len);
     if (ret < 0) ERR_EXIT("connect");
     return sockfd;
