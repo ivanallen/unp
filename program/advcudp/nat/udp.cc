@@ -158,14 +158,16 @@ void beat(int sockfd, struct sockaddr_in *servaddr) {
     sendto(sockfd, buf, 16, 0, (struct sockaddr*)servaddr, sizeof(sockaddr_in));
     nr = recvfrom(sockfd, addrs, 16 * sizeof(sockaddr_in), 0, NULL, NULL);
 
+    count = nr / 16; // 总条数
+
     len = sizeof(sockaddr_in);
     getsockname(sockfd, (struct sockaddr*)&thisAddr, &len);
+
     WARNING("this addr %s:%d\n",
         inet_ntoa(thisAddr.sin_addr), ntohs(thisAddr.sin_port));
 
     if (nr < 0) ERR_EXIT("recvfrom");
 
-    count = nr / 16; // 总条数
 
     if (count > 0)
         printf("设备列表(%d):\n", count);
@@ -181,14 +183,18 @@ void beat(int sockfd, struct sockaddr_in *servaddr) {
         int index = 0;
         printf("选一个你想打洞的目标:");
         scanf("%d", &index);
+        printf("ok! 你选择了第 %d 个设备\n", index);
         strcpy(buf, "probe");
         // 发送探测包
-        sendto(sockfd, buf, 16, 0, (struct sockaddr*)&addrs[index], sizeof(sockaddr_in));
+        LOG("正确激活通道... %s:%d -> %s:%d\n",
+            inet_ntoa(thisAddr.sin_addr), ntohs(thisAddr.sin_port),
+            inet_ntoa(addrs[index].sin_addr), ntohs(addrs[index].sin_port));
+        sendto(sockfd, buf, 64, 0, (struct sockaddr*)&addrs[index], sizeof(sockaddr_in));
+        LOG("完成!\n");
         // 发送 feedback 包，由服务转发给目标
         strcpy(buf, "feedback");
-        //*(struct sockaddr_in*)(buf + 12) = addrs[index];
-        memcpy(buf + 12, addrs + index, sizeof(sockaddr_in));
-        LOG("发送 feedback 给目标 %s:%d\n",
+        *(struct sockaddr_in*)(buf + 12) = addrs[index];
+        LOG("发送 feedback, 请求目标 %s:%d 反馈\n",
             inet_ntoa(addrs[index].sin_addr), ntohs(addrs[index].sin_port));
         sendto(sockfd, buf, 12 + sizeof(sockaddr_in), 0, (struct sockaddr*)servaddr, sizeof(sockaddr_in));
     }
@@ -213,31 +219,34 @@ void doClient(int sockfd) {
 
     while(1) {
         len = sizeof(sockaddr_in);
-        nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&peeraddr, &len);
-        LOG("recv from %s:%d %s\n",
-            inet_ntoa(peeraddr.sin_addr), ntohs(peeraddr.sin_port), buf);
+        if (status == 0) {
+            nr = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&peeraddr, &len);
+            LOG("recv from %s:%d %s\n",
+                inet_ntoa(peeraddr.sin_addr), ntohs(peeraddr.sin_port), buf);
 
-        if (!strcmp("feedback", buf)) {
-            addr = *(struct sockaddr_in*)(buf + 12);
-            LOG("say hello to %s:%d\n",
-                inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
-            sendto(sockfd, "Hello friend!", strlen("Hello friend!") + 1,
-                0, (struct sockaddr*)&addr, sizeof(sockaddr_in));
-            status = 1;
-        }
+            if (!strcmp("feedback", buf)) {
+                addr = *(struct sockaddr_in*)(buf + 12);
+                LOG("say hello to %s:%d\n",
+                    inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+                sendto(sockfd, "Hello friend!", strlen("Hello friend!") + 1,
+                    0, (struct sockaddr*)&addr, sizeof(sockaddr_in));
+                status = 1;
+            }
 
-        if (!strcmp("probe", buf)) {
-            /*
-            sendto(sockfd, "Hello friend!", strlen("Hello friend!") + 1,
-                0, (struct sockaddr*)&peeraddr, sizeof(sockaddr_in));
-             */
+            if (!strcmp("probe", buf)) {
+                /*
+                sendto(sockfd, "Hello friend!", strlen("Hello friend!") + 1,
+                    0, (struct sockaddr*)&peeraddr, sizeof(sockaddr_in));
+                 */
+            }
         }
 
 
         // 被打通的这一端将可以主动发信息给请求者，而不经过服务器。
-        if (status) {
-            nr = iread(STDIN_FILENO, buf, 4096);
-            sendto(sockfd, buf, nr + 1, 0, (struct sockaddr*)&addr, sizeof(sockaddr_in));
+        if (status == 1) {
+            printf("input:");
+            scanf("%s", buf);
+            sendto(sockfd, buf, strlen(buf) + 1, 0, (struct sockaddr*)&addr, sizeof(sockaddr_in));
         }
     }
 }
