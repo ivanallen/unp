@@ -187,8 +187,9 @@ void beat(int sockfd, struct sockaddr_in *servaddr) {
         strcpy(buf, "probe");
         // 发送探测包
         LOG("正确激活通道...");
-        printf("%s:%d -> %s:%d\n",
-            inet_ntoa(thisAddr.sin_addr), ntohs(thisAddr.sin_port),
+        printf("%s:%d -> ",
+            inet_ntoa(thisAddr.sin_addr), ntohs(thisAddr.sin_port));
+        printf("%s:%d\n",
             inet_ntoa(addrs[index].sin_addr), ntohs(addrs[index].sin_port));
         sendto(sockfd, buf, 64, 0, (struct sockaddr*)&addrs[index], sizeof(sockaddr_in));
         LOG("完成!\n");
